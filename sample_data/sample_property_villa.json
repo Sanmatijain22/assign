@@ -1,0 +1,25 @@
+{
+  "name": "Ocean Crest Luxury Villa",
+  "location": "Goa Coast",
+  "price": "₹6.5 Crore",
+  "property_type": "Luxury Villa",
+  "bedrooms": 4,
+  "description": "Ultra-luxury 4-bedroom oceanfront villa featuring private infinity pool, panoramic sunset terraces, custom designer finishes, and serene coastal living.",
+  "features": [
+    "Private infinity pool",
+    "Panoramic ocean view",
+    "Modular chef kitchen",
+    "Four master bedroom suites",
+    "Sunset rooftop terrace",
+    "Private landscaped lawn"
+  ],
+  "call_to_action": "Schedule an exclusive private tour today.",
+  "images": [
+    "assets/sample_images_villa/01_villa_exterior.jpg",
+    "assets/sample_images_villa/02_villa_living_room.jpg",
+    "assets/sample_images_villa/03_villa_kitchen.jpg",
+    "assets/sample_images_villa/04_villa_bedroom.jpg",
+    "assets/sample_images_villa/05_villa_balcony.jpg",
+    "assets/sample_images_villa/06_villa_pool_amenity.jpg"
+  ]
+}

@@ -1,0 +1,566 @@
+/* ===================================================================
+   Property Studio AI — shadcn/ui Zinc Design System
+   Pixel-perfect implementation of the iconic shadcn/ui components:
+   - Radix/Tailwind aesthetic with crisp 1px zinc borders
+   - Neutral/Zinc color palette (zinc-950, zinc-900, zinc-500, zinc-200, zinc-100)
+   - Pill-segmented tabs with active card elevation
+   - Clean card containers with subtle shadow-xs
+   - Sleek modern typography with Inter (-0.02em tracking)
+   - Refined input focus rings (ring-1 ring-zinc-950)
+   - Dark zinc sidebar with subtle borders
+   =================================================================== */
+
+/* ─── Google Font ─── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ─── CSS Custom Properties (shadcn/ui Zinc) ─── */
+:root {
+    --background: #FAFAFA;
+    --foreground: #09090B;
+    --card: #FFFFFF;
+    --card-foreground: #09090B;
+    --popover: #FFFFFF;
+    --popover-foreground: #09090B;
+    --primary: #18181B;
+    --primary-foreground: #FAFAFA;
+    --secondary: #F4F4F5;
+    --secondary-foreground: #18181B;
+    --muted: #F4F4F5;
+    --muted-foreground: #71717A;
+    --accent: #F4F4F5;
+    --accent-foreground: #18181B;
+    --destructive: #EF4444;
+    --destructive-foreground: #FAFAFA;
+    --border: #E4E4E7;
+    --border-hover: #D4D4D8;
+    --input: #E4E4E7;
+    --ring: #18181B;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.08), 0 1px 2px -1px rgb(0 0 0 / 0.08);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.08);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+    --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Global Resets & Typography ─── */
+html, body, [class*="css"] {
+    font-family: var(--font-sans) !important;
+    color: var(--foreground) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Main App Background & Top Spacing ─── */
+.stApp {
+    background-color: var(--background) !important;
+}
+
+header[data-testid="stHeader"] {
+    background: transparent !important;
+    height: 2.2rem !important;
+    z-index: 10 !important;
+}
+
+.main .block-container,
+div[data-testid="stAppViewBlockContainer"],
+.block-container {
+    padding-top: 1.2rem !important;
+    padding-bottom: 2.5rem !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    max-width: 1200px !important;
+}
+
+/* ─── shadcn Dark Sidebar ─── */
+section[data-testid="stSidebar"] {
+    background-color: #09090B !important;
+    border-right: 1px solid #27272A !important;
+}
+
+section[data-testid="stSidebar"] * {
+    color: #E4E4E7 !important;
+}
+
+section[data-testid="stSidebar"] hr {
+    border-color: #27272A !important;
+    margin: 1rem 0 !important;
+}
+
+section[data-testid="stSidebar"] .stSelectbox label,
+section[data-testid="stSidebar"] .stCheckbox label,
+section[data-testid="stSidebar"] .stSlider label {
+    color: #A1A1AA !important;
+    font-size: 0.815rem !important;
+    font-weight: 500 !important;
+}
+
+section[data-testid="stSidebar"] .stSelectbox > div > div {
+    background-color: #18181B !important;
+    border: 1px solid #27272A !important;
+    border-radius: var(--radius-sm) !important;
+    color: #FAFAFA !important;
+}
+
+section[data-testid="stSidebar"] .stSelectbox > div > div:focus-within {
+    border-color: #52525B !important;
+    box-shadow: 0 0 0 1px #52525B !important;
+}
+
+section[data-testid="stSidebar"] .stExpander {
+    background-color: #111113 !important;
+    border: 1px solid #27272A !important;
+    border-radius: var(--radius-md) !important;
+}
+
+/* Sidebar preset buttons (shadcn secondary / outline on dark) */
+section[data-testid="stSidebar"] .stButton > button {
+    background-color: #18181B !important;
+    border: 1px solid #27272A !important;
+    color: #F4F4F5 !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 500 !important;
+    font-size: 0.815rem !important;
+    padding: 0.45rem 0.75rem !important;
+    transition: all var(--transition) !important;
+}
+
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background-color: #27272A !important;
+    border-color: #3F3F46 !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+}
+
+/* ─── shadcn Hero Header ─── */
+.hero-header {
+    padding: 0.2rem 0 0.8rem 0;
+}
+
+.hero-title {
+    font-family: var(--font-sans) !important;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0.15rem 0 0 0;
+    letter-spacing: -0.035em;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-family: var(--font-sans);
+    font-size: 0.925rem;
+    color: var(--muted-foreground);
+    margin: 0.25rem 0 0 0;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+/* ─── shadcn Badge Component ─── */
+.shadcn-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #F4F4F5;
+    color: #18181B;
+    border: 1px solid #E4E4E7;
+    font-size: 0.725rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.35rem;
+}
+
+.shadcn-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: #10B981;
+}
+
+/* ─── shadcn Segmented Pill Tabs ─── */
+.stTabs [data-baseweb="tab-list"] {
+    background-color: #F4F4F5 !important;
+    border: 1px solid #E4E4E7 !important;
+    border-radius: var(--radius-md) !important;
+    padding: 3px !important;
+    gap: 3px !important;
+    display: inline-flex !important;
+    width: auto !important;
+    margin-bottom: 1.25rem !important;
+}
+
+.stTabs [data-baseweb="tab"],
+button[data-baseweb="tab"] {
+    font-family: var(--font-sans) !important;
+    font-weight: 500 !important;
+    font-size: 0.84rem !important;
+    color: #71717A !important;
+    padding: 6px 14px !important;
+    border-radius: var(--radius-sm) !important;
+    border: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+    background: transparent !important;
+    transition: all var(--transition) !important;
+}
+
+.stTabs [data-baseweb="tab"]:hover,
+button[data-baseweb="tab"]:hover {
+    color: #09090B !important;
+    background-color: rgba(0, 0, 0, 0.04) !important;
+    border-bottom: none !important;
+}
+
+.stTabs [aria-selected="true"],
+button[data-baseweb="tab"][aria-selected="true"] {
+    background-color: #FFFFFF !important;
+    color: #09090B !important;
+    font-weight: 600 !important;
+    border-radius: var(--radius-sm) !important;
+    border: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Eliminate any tab underlines or red accents */
+div[data-baseweb="tab-highlight"],
+div[data-baseweb="tab-border"],
+.stTabs [data-baseweb="tab-highlight"],
+.stTabs [data-baseweb="tab-border"],
+[data-baseweb="tab-highlight"],
+[data-baseweb="tab-border"] {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    background-color: transparent !important;
+    height: 0 !important;
+    width: 0 !important;
+    border: none !important;
+}
+
+div[data-testid="stTabs"] [data-baseweb="tab-list"],
+.stTabs [data-baseweb="tab-list"] {
+    border-bottom: none !important;
+}
+
+/* ─── shadcn Card Component ─── */
+.studio-card,
+[data-testid="stVerticalBlockBorderWrapper"] {
+    background: #FFFFFF !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 1.5rem !important;
+    box-shadow: var(--shadow-xs) !important;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.studio-card:hover,
+[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    border-color: var(--border-hover) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.shadcn-card-header {
+    margin-bottom: 1.25rem;
+}
+
+.shadcn-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #09090B;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.shadcn-card-description {
+    font-size: 0.825rem;
+    color: #71717A;
+    margin-top: 2px;
+}
+
+/* ─── Section Headers ─── */
+.section-header {
+    font-family: var(--font-sans) !important;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #09090B;
+    margin: 1.2rem 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: -0.02em;
+}
+
+.section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+}
+
+/* ─── shadcn Input & Textarea Fields ─── */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+.stNumberInput > div > div > input {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--input) !important;
+    border-radius: var(--radius-sm) !important;
+    color: #09090B !important;
+    font-family: var(--font-sans) !important;
+    font-size: 0.875rem !important;
+    padding: 0.5rem 0.75rem !important;
+    box-shadow: var(--shadow-xs) !important;
+    transition: border-color var(--transition), box-shadow var(--transition) !important;
+}
+
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus,
+.stNumberInput > div > div > input:focus {
+    border-color: #18181B !important;
+    box-shadow: 0 0 0 1px #18181B !important;
+    outline: none !important;
+}
+
+.stTextInput label,
+.stTextArea label,
+.stNumberInput label,
+.stSelectbox label {
+    color: #09090B !important;
+    font-weight: 500 !important;
+    font-size: 0.815rem !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* ─── shadcn Selectbox ─── */
+.stSelectbox > div > div {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--input) !important;
+    border-radius: var(--radius-sm) !important;
+    color: #09090B !important;
+    font-size: 0.875rem !important;
+    box-shadow: var(--shadow-xs) !important;
+    transition: border-color var(--transition), box-shadow var(--transition) !important;
+}
+
+.stSelectbox > div > div:focus-within {
+    border-color: #18181B !important;
+    box-shadow: 0 0 0 1px #18181B !important;
+}
+
+/* ─── shadcn Primary Button ─── */
+div[data-testid="stMainBlockContainer"] button[kind="primary"],
+.stButton > button[kind="primary"] {
+    background-color: #18181B !important;
+    color: #FAFAFA !important;
+    border: 1px solid #18181B !important;
+    border-radius: var(--radius-sm) !important;
+    font-family: var(--font-sans) !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    padding: 0.65rem 1.5rem !important;
+    letter-spacing: -0.01em;
+    box-shadow: var(--shadow-xs) !important;
+    transition: all var(--transition) !important;
+}
+
+div[data-testid="stMainBlockContainer"] button[kind="primary"]:hover,
+.stButton > button[kind="primary"]:hover {
+    background-color: #27272A !important;
+    border-color: #27272A !important;
+    box-shadow: var(--shadow-sm) !important;
+    transform: translateY(-1px);
+}
+
+div[data-testid="stMainBlockContainer"] button[kind="primary"]:active,
+.stButton > button[kind="primary"]:active {
+    transform: translateY(0);
+}
+
+/* ─── shadcn Secondary / Outline Button ─── */
+div[data-testid="stMainBlockContainer"] button[kind="secondary"],
+div[data-testid="stMainBlockContainer"] .stButton > button:not([kind="primary"]) {
+    background-color: #FFFFFF !important;
+    color: #18181B !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-sm) !important;
+    font-family: var(--font-sans) !important;
+    font-weight: 500 !important;
+    font-size: 0.835rem !important;
+    box-shadow: var(--shadow-xs) !important;
+    transition: all var(--transition) !important;
+}
+
+div[data-testid="stMainBlockContainer"] button[kind="secondary"]:hover,
+div[data-testid="stMainBlockContainer"] .stButton > button:not([kind="primary"]):hover {
+    background-color: #F4F4F5 !important;
+    border-color: var(--border-hover) !important;
+    color: #09090B !important;
+}
+
+/* ─── shadcn Download Button ─── */
+.stDownloadButton > button {
+    background-color: #18181B !important;
+    color: #FAFAFA !important;
+    border: 1px solid #18181B !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    padding: 0.65rem 1.5rem !important;
+    box-shadow: var(--shadow-xs) !important;
+    transition: all var(--transition) !important;
+}
+
+.stDownloadButton > button:hover {
+    background-color: #27272A !important;
+    box-shadow: var(--shadow-sm) !important;
+    transform: translateY(-1px);
+}
+
+/* ─── shadcn Accordion / Expander ─── */
+.stExpander {
+    background-color: #FFFFFF !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-xs) !important;
+    transition: border-color var(--transition);
+}
+
+.stExpander:hover {
+    border-color: var(--border-hover) !important;
+}
+
+.stExpander summary {
+    font-weight: 500 !important;
+    color: #09090B !important;
+    font-size: 0.85rem !important;
+    letter-spacing: -0.01em !important;
+}
+
+/* ─── shadcn Metric / Stat Cards ─── */
+.metric-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.15rem 1.25rem;
+    box-shadow: var(--shadow-xs);
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.metric-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: var(--shadow-sm);
+}
+
+.metric-label {
+    font-size: 0.775rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    letter-spacing: -0.01em;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--foreground);
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    margin-top: 0.15rem;
+}
+
+/* ─── File Uploader ─── */
+[data-testid="stFileUploader"] {
+    border: 1px dashed var(--border-hover) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 1.25rem !important;
+    background: #FFFFFF !important;
+    transition: all var(--transition) !important;
+}
+
+[data-testid="stFileUploader"]:hover {
+    border-color: #18181B !important;
+    background: #FAFAFA !important;
+}
+
+/* ─── Progress Bar ─── */
+.stProgress > div > div > div > div {
+    background-color: #18181B !important;
+    border-radius: 9999px !important;
+}
+
+.stProgress > div > div {
+    background-color: #E4E4E7 !important;
+    border-radius: 9999px !important;
+}
+
+/* ─── Video Player ─── */
+.stVideo {
+    border-radius: var(--radius-lg) !important;
+    overflow: hidden !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* ─── Clean Scrollbar ─── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D4D4D8;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #A1A1AA;
+}
+
+/* ─── Shadcn Metric Card ─── */
+.shadcn-metric-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.25rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all var(--transition);
+}
+
+.shadcn-metric-card:hover {
+    border-color: #D4D4D8;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+}
+
+.shadcn-metric-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: #71717A;
+    letter-spacing: 0.02em;
+    margin-bottom: 0.25rem;
+}
+
+.shadcn-metric-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #09090B;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+}
+
+.shadcn-metric-desc {
+    font-size: 0.75rem;
+    color: #A1A1AA;
+    margin-top: 0.35rem;
+}
