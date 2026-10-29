@@ -283,7 +283,7 @@ float vig=1.-smoothstep(.6,1.8,length(uv0));finalColor*=vig;gl_FragColor=vec4(fi
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
 
           <!-- ── LEFT WORKBENCH (7 cols) ──────────────────────────────── -->
-          <div id="workbench" class="lg:col-span-12 flex flex-col gap-space-md">
+          <div id="workbench" class="lg:col-span-12 flex h-full flex-col gap-space-md">
 
             <!-- Mode Tabs -->
             <div class="flex items-center gap-space-xs p-1 rounded-xl bg-surface-container-lowest shadow-inner">
@@ -661,7 +661,7 @@ Private Rooftop Terrace</textarea>
           </div>
 
           <!-- ── RIGHT PANEL (5 cols) ─────────────────────────────────── -->
-          <div id="narrationPanel" class="hidden lg:col-span-5 flex-col gap-space-md">
+          <div id="narrationPanel" class="hidden h-full lg:col-span-5 flex-col gap-space-md">
             <!-- Render progress -->
             <div id="renderProgress" class="p-space-md rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-xl flex flex-col gap-space-xs hidden">
                 <div class="flex items-center justify-between text-body-sm">
@@ -681,7 +681,7 @@ Private Rooftop Terrace</textarea>
             </div>
 
             <!-- AI Narration Teleprompter -->
-            <div class="rounded-2xl bg-surface-container-low border border-outline-variant/30 p-space-md shadow-xl flex flex-col gap-space-sm">
+            <div class="flex flex-1 flex-col rounded-2xl bg-surface-container-low border border-outline-variant/30 p-space-md shadow-xl gap-space-sm">
               <div class="flex items-center justify-between pb-1 border-b border-surface-variant/30">
                 <div class="flex items-center gap-2">
                   <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
