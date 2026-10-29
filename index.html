@@ -283,7 +283,7 @@ float vig=1.-smoothstep(.6,1.8,length(uv0));finalColor*=vig;gl_FragColor=vec4(fi
         <section class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
 
           <!-- ── LEFT WORKBENCH (7 cols) ──────────────────────────────── -->
-          <div class="lg:col-span-7 flex flex-col gap-space-md">
+          <div id="workbench" class="lg:col-span-12 flex flex-col gap-space-md">
 
             <!-- Mode Tabs -->
             <div class="flex items-center gap-space-xs p-1 rounded-xl bg-surface-container-lowest shadow-inner">
@@ -661,7 +661,7 @@ Private Rooftop Terrace</textarea>
           </div>
 
           <!-- ── RIGHT PANEL (5 cols) ─────────────────────────────────── -->
-          <div class="lg:col-span-5 flex flex-col gap-space-md">
+          <div id="narrationPanel" class="hidden lg:col-span-5 flex-col gap-space-md">
             <!-- Render progress -->
             <div id="renderProgress" class="p-space-md rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-xl flex flex-col gap-space-xs hidden">
                 <div class="flex items-center justify-between text-body-sm">
@@ -763,6 +763,8 @@ const tabs = [
 ];
 tabs.forEach(({ btn, panel }) => {
   document.getElementById(btn).addEventListener('click', () => {
+    const workbench = document.getElementById('workbench');
+    const narrationPanel = document.getElementById('narrationPanel');
     tabs.forEach(t => {
       const b = document.getElementById(t.btn), p = document.getElementById(t.panel);
       b.classList.remove('bg-primary-container','text-on-primary-container','shadow-md');
@@ -774,6 +776,12 @@ tabs.forEach(({ btn, panel }) => {
     b.classList.remove('text-on-surface-variant','hover:bg-surface-container-high');
     p.classList.remove('hidden');
     if (panel === 'panelPreview') p.classList.add('flex');
+
+    const showNarration = panel === 'panelPreview';
+    workbench.classList.toggle('lg:col-span-12', !showNarration);
+    workbench.classList.toggle('lg:col-span-7', showNarration);
+    narrationPanel.classList.toggle('hidden', !showNarration);
+    narrationPanel.classList.toggle('flex', showNarration);
   });
 });
 
