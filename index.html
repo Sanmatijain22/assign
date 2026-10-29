@@ -662,26 +662,8 @@ Private Rooftop Terrace</textarea>
 
           <!-- ── RIGHT PANEL (5 cols) ─────────────────────────────────── -->
           <div class="lg:col-span-5 flex flex-col gap-space-md">
-            <!-- Live viewport -->
-            <div class="rounded-2xl bg-surface-container-low shadow-2xl overflow-hidden flex flex-col">
-              <div class="relative w-full aspect-video bg-black overflow-hidden group">
-                <img id="viewportImg" alt="Property preview" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=960&q=80">
-                <div class="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-black/20 pointer-events-none"></div>
-                <div id="viewportPlayBtn" class="absolute inset-0 m-auto w-16 h-16 rounded-full bg-primary/90 text-on-primary flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-transform backdrop-blur-md cursor-pointer">
-                  <span class="material-symbols-outlined text-[32px] ml-1">play_arrow</span>
-                </div>
-                <div class="absolute bottom-4 inset-x-4 flex items-center justify-between">
-                  <div class="flex items-center gap-2 px-space-sm py-1 rounded-md bg-surface-container-lowest/80 backdrop-blur-md">
-                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
-                    <span class="font-mono text-body-sm text-on-surface font-bold" id="viewportTime">Preview Ready</span>
-                  </div>
-                  <div class="flex items-center gap-space-xs">
-                    <span class="px-2 py-0.5 rounded bg-surface-container-lowest/80 backdrop-blur-md text-primary font-label-caps text-label-caps font-bold">4K UHD</span>
-                  </div>
-                </div>
-              </div>
-              <!-- Render progress -->
-              <div id="renderProgress" class="p-space-md bg-surface-container flex flex-col gap-space-xs hidden">
+            <!-- Render progress -->
+            <div id="renderProgress" class="p-space-md rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-xl flex flex-col gap-space-xs hidden">
                 <div class="flex items-center justify-between text-body-sm">
                   <span class="font-label-caps text-label-caps text-outline uppercase tracking-wider" id="progressLabel">Rendering</span>
                   <span class="font-label-caps text-label-caps text-primary font-bold" id="progressPct">0%</span>
@@ -689,14 +671,13 @@ Private Rooftop Terrace</textarea>
                 <div class="relative w-full h-3 bg-surface-container-lowest rounded-full overflow-hidden flex items-center px-1">
                   <div id="progressBar" class="h-full progress-bar-animated rounded-full" style="width:0%"></div>
                 </div>
+            </div>
+            <div id="renderStatus" class="p-space-md rounded-2xl bg-surface-container-low flex items-center justify-between border border-outline-variant/30 shadow-xl hidden">
+              <div class="flex items-center gap-space-xs">
+                <span class="material-symbols-outlined text-primary text-[18px] animate-spin">cyclone</span>
+                <span class="font-label-interactive text-label-interactive text-on-surface" id="renderStatusText">Initializing…</span>
               </div>
-              <div id="renderStatus" class="p-space-md bg-surface-container-low flex items-center justify-between border-t border-surface-variant/40 hidden">
-                <div class="flex items-center gap-space-xs">
-                  <span class="material-symbols-outlined text-primary text-[18px] animate-spin">cyclone</span>
-                  <span class="font-label-interactive text-label-interactive text-on-surface" id="renderStatusText">Initializing…</span>
-                </div>
-                <span class="text-outline font-body-sm text-body-sm" id="renderEta"></span>
-              </div>
+              <span class="text-outline font-body-sm text-body-sm" id="renderEta"></span>
             </div>
 
             <!-- AI Narration Teleprompter -->
@@ -1110,7 +1091,6 @@ function onVideoReady(videoUrl, filename, scriptData) {
   // Switch to preview tab
   document.getElementById('tabPreview').click();
   showToast('🎬 4K Cinema video ready!', 'success');
-  document.getElementById('viewportTime').textContent = 'Video Generated ✓';
 }
 
 // Wire all generate buttons
@@ -1119,10 +1099,6 @@ function onVideoReady(videoUrl, filename, scriptData) {
   if (el) el.addEventListener('click', synthesize);
 });
 
-// Preview play button → switch to preview tab
-document.getElementById('viewportPlayBtn').addEventListener('click', () => {
-  document.getElementById('tabPreview').click();
-});
 </script>
 
 </body>
