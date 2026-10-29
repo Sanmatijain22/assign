@@ -3,7 +3,9 @@
 from pathlib import Path
 import shutil
 import tempfile
+import threading
 import time
+from queue import Empty, Queue
 from typing import List, Optional
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -115,43 +117,55 @@ async def generate(
     output_path = OUTPUT_DIR / filename
 
     def render_stream():
-        events = []
+        events = Queue()
 
         def progress(ratio: float, status: str):
-            events.append({"progress": ratio, "status": status})
+            events.put({"progress": ratio, "status": status})
 
         yield '{"progress":0.05,"status":"Preparing validated property data..."}\n'
+
+        def render_video():
+            try:
+                progress(0.12, "Generating cinematic script...")
+                progress(0.18, "Rendering scenes and audio...")
+                generate_property_video(
+                    prop=prop,
+                    output_path=output_path,
+                    script=script,
+                    include_narration=include_narration,
+                    include_background_music=include_background_music,
+                    fps=24,
+                    progress_callback=progress,
+                    tts_tld=tts_tld,
+                    tts_slow=tts_slow,
+                    bg_music_volume=max(0.0, min(bg_music_volume, 1.0)),
+                )
+                events.put({
+                    "progress": 1,
+                    "status": "Video ready!",
+                    "done": True,
+                    "video_url": f"/output/{filename}",
+                    "filename": filename,
+                    "script": _script_payload(script),
+                })
+            except (VideoGenerationError, OSError, ValueError) as error:
+                events.put({"error": str(error)})
+
+        worker = threading.Thread(target=render_video, daemon=True)
+        worker.start()
+
         try:
-            yield '{"progress":0.12,"status":"Generating cinematic script..."}\n'
-            yield '{"progress":0.18,"status":"Rendering scenes and audio..."}\n'
-            generate_property_video(
-                prop=prop,
-                output_path=output_path,
-                script=script,
-                include_narration=include_narration,
-                include_background_music=include_background_music,
-                fps=24,
-                progress_callback=progress,
-                tts_tld=tts_tld,
-                tts_slow=tts_slow,
-                bg_music_volume=max(0.0, min(bg_music_volume, 1.0)),
-            )
-            for event in events:
-                import json
-                yield json.dumps(event) + "\n"
-            import json
-            yield json.dumps({
-                "progress": 1,
-                "status": "Video ready!",
-                "done": True,
-                "video_url": f"/output/{filename}",
-                "filename": filename,
-                "script": _script_payload(script),
-            }) + "\n"
-        except (VideoGenerationError, OSError, ValueError) as error:
-            import json
-            yield json.dumps({"error": str(error)}) + "\n"
+            while worker.is_alive() or not events.empty():
+                try:
+                    import json
+                    event = events.get(timeout=0.25)
+                    yield json.dumps(event) + "\n"
+                    if event.get("done") or event.get("error"):
+                        break
+                except Empty:
+                    continue
         finally:
+            worker.join()
             if upload_dir:
                 shutil.rmtree(upload_dir, ignore_errors=True)
 
