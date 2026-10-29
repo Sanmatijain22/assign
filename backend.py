@@ -334,7 +334,12 @@ async def run_video_generation(job_id: str, prop_input, prop_data_dict, output_d
             "video_url": f"/download/{result_path.name}",
             "filename": result_path.name,
             "script": {
-                "scenes": [{"headline": s.headline, "category_tag": s.category_tag, "duration": s.duration} for s in script.scenes]
+                "scenes": [{
+                    "headline": s.headline,
+                    "category_tag": s.category_tag,
+                    "duration": s.duration,
+                    "voiceover": s.voiceover,
+                } for s in script.scenes]
             }
         }
 

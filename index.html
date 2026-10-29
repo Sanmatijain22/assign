@@ -661,7 +661,7 @@ Private Rooftop Terrace</textarea>
           </div>
 
           <!-- ── RIGHT PANEL (5 cols) ─────────────────────────────────── -->
-          <div class="lg:col-span-5 flex flex-col gap-space-md h-full justify-between">
+          <div class="lg:col-span-5 flex flex-col gap-space-md">
             <!-- Live viewport -->
             <div class="rounded-2xl bg-surface-container-low shadow-2xl overflow-hidden flex flex-col">
               <div class="relative w-full aspect-video bg-black overflow-hidden group">
@@ -715,7 +715,7 @@ Private Rooftop Terrace</textarea>
                   </div>
                 </div>
               </div>
-              <div id="teleprompterText" class="p-3 rounded-xl bg-surface-container-lowest border border-surface-variant/30 text-body-lg leading-relaxed text-on-surface-variant opacity-70 italic min-h-[100px] max-h-[180px] overflow-y-auto">
+              <div id="teleprompterText" class="p-3 rounded-xl bg-surface-container-lowest border border-surface-variant/30 text-body-lg leading-relaxed text-on-surface-variant opacity-70 italic min-h-[72px] max-h-[180px] overflow-y-auto">
                 Fill in property details to preview the AI-generated narration script…
               </div>
               <div class="flex items-center gap-0.5 text-primary opacity-70 mt-1">
@@ -883,16 +883,24 @@ function updateTeleprompter() {
   const name = document.getElementById('propName').value || 'this stunning property';
   const loc  = document.getElementById('propLoc').value  || 'a prime location';
   const price = document.getElementById('propPrice').value || '';
-  const feats = (document.getElementById('propFeatures').value || '').split('\n').filter(f=>f.trim()).slice(0,2);
+  const type = document.getElementById('propType').value || 'beautiful home';
+  const desc = document.getElementById('propDesc').value.trim();
+  const cta = document.getElementById('propCta').value.trim();
+  const feats = (document.getElementById('propFeatures').value || '').split('\n').map(f => f.trim()).filter(Boolean).slice(0, 4);
   let text = `Welcome to ${name}, located in ${loc}.`;
+  text += ` This ${type.toLowerCase()} is designed for elevated everyday living.`;
   if (price) text += ` Listed at ${price}.`;
-  if (feats.length) text += ` Featuring ${feats.join(' and ')}.`;
-  document.getElementById('teleprompterText').textContent = text;
-  document.getElementById('teleprompterText').classList.remove('italic','opacity-70');
+  if (desc) text += ` ${desc}`;
+  if (feats.length) text += ` Highlights include ${feats.join(', ')}.`;
+  if (cta) text += ` ${cta}.`;
+  const teleprompter = document.getElementById('teleprompterText');
+  teleprompter.textContent = text;
+  teleprompter.classList.remove('italic','opacity-70');
 }
-['propName','propLoc','propPrice','propFeatures'].forEach(id => {
+['propName','propLoc','propPrice','propType','propDesc','propCta','propFeatures'].forEach(id => {
   document.getElementById(id).addEventListener('input', updateTeleprompter);
 });
+document.getElementById('propType').addEventListener('change', updateTeleprompter);
 updateTeleprompter();
 
 // ── Image upload ──────────────────────────────────────────────────────────
@@ -1082,6 +1090,13 @@ function onVideoReady(videoUrl, filename, scriptData) {
   // Scene breakdown
   if (scriptData && scriptData.scenes) {
     const bd = document.getElementById('sceneBreakdown');
+    const voiceover = scriptData.scenes
+      .map(scene => scene.voiceover)
+      .filter(Boolean)
+      .join(' ');
+    if (voiceover) {
+      document.getElementById('teleprompterText').textContent = voiceover;
+    }
     bd.innerHTML = scriptData.scenes.map((s, i) => `
       <div class="p-2 rounded-lg bg-surface-container-lowest border border-outline-variant/20 flex items-center gap-2">
         <span class="font-mono text-body-sm text-primary w-6">${i+1}</span>
