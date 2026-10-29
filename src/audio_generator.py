@@ -183,7 +183,7 @@ def generate_tts_audio(
     voice_gender: str = 'female'
 ) -> Optional[Path]:
     """Generate Text-to-Speech (TTS) narration audio.
-    
+
     Supports:
     - Online high-fidelity neural speech via gTTS (with regional accents: co.in, com, co.uk, com.au).
     - 100% offline Windows native speech synthesis via pyttsx3 (SAPI5).
@@ -207,10 +207,13 @@ def generate_tts_audio(
             tts.save(str(output_path))
             if output_path.exists() and output_path.stat().st_size > 100:
                 return output_path
-        except Exception:
+        except Exception as e:
             # If strictly online was requested, don't fall back to offline unless in auto mode
             if engine_mode == 'gtts':
+                print(f"gTTS failed: {e}")
                 return None
+            # In auto mode, continue to offline fallback
+            print(f"gTTS failed, falling back to offline: {e}")
 
     # 2. Offline pyttsx3 synthesis (either in auto fallback or explicit offline mode)
     try:
@@ -218,7 +221,7 @@ def generate_tts_audio(
         engine = pyttsx3.init()
         # Set speaking rate (words per minute)
         engine.setProperty('rate', 140 if slow else 165)
-        
+
         # Configure gender/voice
         voices = engine.getProperty('voices')
         if voices:
@@ -230,16 +233,16 @@ def generate_tts_audio(
                 male_voices = [v for v in voices if 'david' in v.name.lower() or 'male' in v.name.lower()]
                 if male_voices:
                     engine.setProperty('voice', male_voices[0].id)
-        
+
         # Output as WAV if pyttsx3
         wav_target = output_path.with_suffix('.wav')
         engine.save_to_file(clean_text, str(wav_target))
         engine.runAndWait()
-        
+
         if wav_target.exists() and wav_target.stat().st_size > 100:
             return wav_target
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"pyttsx3 failed: {e}")
 
     return None
 

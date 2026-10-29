@@ -87,11 +87,18 @@ pip install -r requirements.txt
 
 > **Note on FFmpeg:** The project utilizes `imageio-ffmpeg`, which automatically manages and bundles a portable static FFmpeg binary (`ffmpeg-win-x86_64-v7.1.exe`). No manual system PATH modification or external installation is required.
 
-### 5. Launch the Streamlit Web Application
+### 5. Launch the Connected Web Application
+```powershell
+python -m uvicorn server:app --host 127.0.0.1 --port 8501
+```
+The application will open in your browser at `http://localhost:8501`. The supplied
+`index.html` frontend is served by FastAPI and its `/api/generate` endpoint is
+connected to the existing validation, script, audio, and video-generation pipeline.
+
+The original Streamlit interface remains available with:
 ```powershell
 python -m streamlit run app.py
 ```
-The application will open in your browser at `http://localhost:8501`.
 
 ---
 
@@ -162,4 +169,3 @@ In real estate marketing, fabricated claims (e.g. invented metro proximity, fals
   The project includes `imageio-ffmpeg` which automatically provides a local standalone binary. If running on a minimal system, ensure `imageio-ffmpeg` is installed.
 - **Port 8501 already in use:**  
   Run `python -m streamlit run app.py --server.port 8502`.
-

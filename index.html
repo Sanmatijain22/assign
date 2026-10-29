@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Property Studio AI | 4K Cinematic Video Generator</title>
+  <meta name="description" content="Transform static property listings into cinematic 4K video tours with neural motion tracking and emotive voiceovers.">
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+
+    /* Drop-zone highlight */
+    .drop-active { border-color: rgb(183 109 255 / 0.7) !important; background: rgb(183 109 255 / 0.08) !important; }
+
+    /* Custom file input */
+    #imageInput { display: none; }
+
+    /* Progress bar animation */
+    @keyframes progress-shine {
+      0%   { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    .progress-bar-animated {
+      background: linear-gradient(90deg, #842bd2, #ddb7ff, #842bd2);
+      background-size: 200% auto;
+      animation: progress-shine 2s linear infinite;
+    }
+
+    /* Thumbnail grid */
+    .thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; }
+    .thumb-grid img { width: 100%; height: 72px; object-fit: cover; border-radius: 8px; border: 1.5px solid transparent; transition: border-color .2s; }
+    .thumb-grid img.selected { border-color: #ddb7ff; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1e1f25; border: 1px solid #4d4354; color: #e3e1e9;
+      padding: .75rem 1.5rem; border-radius: 999px; font-size: 13px;
+      font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600;
+      box-shadow: 0 8px 32px rgba(0,0,0,.6);
+      transition: transform .35s cubic-bezier(.22,.61,.36,1), opacity .35s;
+      opacity: 0; z-index: 9999; white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.error { border-color: #ff4d6d; color: #ff4d6d; }
+    #toast.success { border-color: #4ade80; color: #4ade80; }
+
+    /* Spinner overlay */
+    #renderOverlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(8,8,14,0.82); backdrop-filter: blur(8px);
+      flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;
+    }
+    #renderOverlay.active { display: flex; }
+    .spin-ring {
+      width: 64px; height: 64px; border-radius: 50%;
+      border: 3px solid #34343a;
+      border-top-color: #ddb7ff;
+      animation: spin .9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Video result section */
+    #videoResult { display: none; }
+    #videoResult.visible { display: block; }
+
+    /* Custom dropdown styling */
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: none !important;
+    }
+    select::-ms-expand {
+      display: none;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-tint": "#ddb7ff",
+            "primary-fixed-dim": "#ddb7ff",
+            "surface-container": "#1e1f25",
+            "on-secondary-fixed-variant": "#8c0053",
+            "outline-variant": "#4d4354",
+            "on-secondary-container": "#ffbad3",
+            "secondary-fixed": "#ffd9e4",
+            "on-tertiary-container": "#0d0096",
+            "on-surface-variant": "#cfc2d6",
+            "error-container": "#93000a",
+            "secondary-container": "#aa0266",
+            "inverse-on-surface": "#2f3036",
+            "surface-container-low": "#1a1b21",
+            "primary-container": "#b76dff",
+            "surface-bright": "#38393f",
+            "on-error-container": "#ffdad6",
+            "on-tertiary": "#1000a9",
+            "inverse-surface": "#e3e1e9",
+            "primary": "#ddb7ff",
+            "outline": "#988d9f",
+            "on-secondary-fixed": "#3e0022",
+            "background": "#121318",
+            "on-primary": "#490080",
+            "on-background": "#e3e1e9",
+            "surface-container-lowest": "#0d0e13",
+            "surface-dim": "#121318",
+            "on-surface": "#e3e1e9",
+            "on-error": "#690005",
+            "on-primary-fixed": "#2c0051",
+            "on-primary-container": "#400071",
+            "tertiary-container": "#8083ff",
+            "on-tertiary-fixed": "#07006c",
+            "on-primary-fixed-variant": "#6900b3",
+            "surface-container-high": "#292a2f",
+            "secondary-fixed-dim": "#ffb0cd",
+            "tertiary-fixed-dim": "#c0c1ff",
+            "surface": "#121318",
+            "surface-variant": "#34343a",
+            "tertiary-fixed": "#e1e0ff",
+            "surface-container-highest": "#34343a",
+            "secondary": "#ffb0cd",
+            "on-secondary": "#640039",
+            "on-tertiary-fixed-variant": "#2f2ebe",
+            "primary-fixed": "#f0dbff",
+            "error": "#ffb4ab",
+            "tertiary": "#c0c1ff",
+            "inverse-primary": "#842bd2"
+          },
+          borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          spacing: {
+            "space-md": "1rem", "margin-sm": "1rem", "space-xl": "2.5rem",
+            "space-xs": "0.25rem", "space-lg": "1.5rem", "space-sm": "0.5rem",
+            "gutter": "1.5rem", "margin": "2rem", "gutter-sm": "1rem"
+          },
+          fontFamily: {
+            "display-hero-mobile": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"], "label-interactive": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"],
+            "label-caps": ["Plus Jakarta Sans"], "display-hero": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"]
+          },
+          fontSize: {
+            "display-hero-mobile": ["32px", { lineHeight: "40px", fontWeight: "800" }],
+            "body-sm": ["12px", { lineHeight: "18px", fontWeight: "400" }],
+            "label-interactive": ["13px", { lineHeight: "16px", fontWeight: "600" }],
+            "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "headline-md": ["22px", { lineHeight: "30px", fontWeight: "600" }],
+            "label-caps": ["11px", { lineHeight: "14px", fontWeight: "700" }],
+            "display-hero": ["48px", { lineHeight: "56px", fontWeight: "800" }],
+            "headline-sm": ["18px", { lineHeight: "26px", fontWeight: "600" }],
+            "headline-lg": ["30px", { lineHeight: "38px", fontWeight: "700" }],
+            "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="bg-background font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+
+<!-- ═══ RENDER OVERLAY ════════════════════════════════════════════════════ -->
+<div id="renderOverlay">
+  <div class="spin-ring"></div>
+  <div class="flex flex-col items-center gap-2 text-center">
+    <p class="font-headline-sm text-headline-sm text-on-surface" id="overlayTitle">Synthesizing Cinema…</p>
+    <p class="font-body-sm text-body-sm text-on-surface-variant" id="overlaySubtitle">Rendering Ken Burns zoom & voiceover narration</p>
+    <div class="w-64 h-1.5 bg-surface-container-highest rounded-full overflow-hidden mt-2">
+      <div id="overlayBar" class="h-full progress-bar-animated rounded-full" style="width:5%"></div>
+    </div>
+    <p id="overlayPct" class="font-mono text-body-sm text-primary mt-1">5%</p>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═════════════════════════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<!-- ═══ HEADER ════════════════════════════════════════════════════════════ -->
+<header class="fixed top-0 inset-x-0 z-50 bg-surface-container-lowest/85 backdrop-blur-2xl shadow-[0_1px_16px_rgba(0,0,0,0.45)]">
+  <div class="h-20 w-full px-gutter flex items-center justify-between">
+    <div class="flex items-center gap-space-md">
+      <a class="flex items-center gap-space-sm" href="#">
+        <span class="material-symbols-outlined text-primary text-[28px]">movie_creation</span>
+        <span class="font-headline-sm text-headline-sm font-bold tracking-tight text-on-surface">
+          Property Studio<span class="text-primary">.AI</span>
+        </span>
+      </a>
+      <div class="hidden sm:flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container-high">
+        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+        <span class="font-label-caps text-label-caps uppercase tracking-wider text-primary">v2.4 PRO ENGINE</span>
+      </div>
+    </div>
+    <nav class="hidden lg:flex items-center gap-space-xs">
+      <a class="px-space-md py-space-sm transition-colors bg-primary-container text-on-primary-container rounded-lg font-bold" href="#">Studio</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══ MAIN ═══════════════════════════════════════════════════════════════ -->
+<main class="w-full pt-20 bg-background flex-1">
+  <div class="flex flex-col w-full">
+
+    <!-- Dynamic Ambient Shader Canvas Layer -->
+    <div class="relative w-full overflow-hidden bg-background">
+      <div class="absolute inset-0 w-full h-full pointer-events-none opacity-40" style="display:block;">
+        <canvas id="shader-canvas" style="display:block;width:100%;height:100%" width="1280" height="1035"></canvas>
+        <script>
+          (function() {
+            const canvas = document.getElementById('shader-canvas');
+            function syncSize() {
+              const w = canvas.clientWidth || 1280, h = canvas.clientHeight || 720;
+              if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+            }
+            if (typeof ResizeObserver !== 'undefined') new ResizeObserver(syncSize).observe(canvas);
+            syncSize();
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (!gl) return;
+            const vs = `attribute vec2 a_position;varying vec2 v_texCoord;void main(){v_texCoord=a_position*.5+.5;gl_Position=vec4(a_position,0.,1.);}`;
+            const fs = `precision highp float;uniform float u_time;uniform vec2 u_resolution;uniform vec2 u_mouse;
+vec3 palette(in float t){vec3 a=vec3(.06,.05,.12);vec3 b=vec3(.35,.18,.55);vec3 c=vec3(.8,.5,1.2);vec3 d=vec3(.1,.25,.6);return a+b*cos(6.28318*(c*t+d));}
+void main(){vec2 uv=(gl_FragCoord.xy*2.-u_resolution.xy)/min(u_resolution.x,u_resolution.y);vec2 uv0=uv;vec3 finalColor=vec3(.04,.04,.08);float t=u_time*.25;
+for(float i=0.;i<3.;i++){uv=fract(uv*1.4)-.5;float d=length(uv)*exp(-length(uv0));vec3 col=palette(length(uv0)+i*.4+t);d=sin(d*7.+t)/7.;d=abs(d);d=pow(.018/d,1.15);finalColor+=col*d*.4;}
+float vig=1.-smoothstep(.6,1.8,length(uv0));finalColor*=vig;gl_FragColor=vec4(finalColor,1.);}`;
+            function cs(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);return s;}
+            const prog=gl.createProgram();gl.attachShader(prog,cs(gl.VERTEX_SHADER,vs));gl.attachShader(prog,cs(gl.FRAGMENT_SHADER,fs));gl.linkProgram(prog);gl.useProgram(prog);
+            const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+            const pos=gl.getAttribLocation(prog,'a_position');gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,2,gl.FLOAT,false,0,0);
+            const uTime=gl.getUniformLocation(prog,'u_time'),uRes=gl.getUniformLocation(prog,'u_resolution'),uMouse=gl.getUniformLocation(prog,'u_mouse');
+            let mouse={x:canvas.width/2,y:canvas.height/2};
+            window.addEventListener('mousemove',e=>{const r=canvas.getBoundingClientRect();if(r.width&&r.height){mouse.x=(e.clientX-r.left)/r.width*canvas.width;mouse.y=(1-(e.clientY-r.top)/r.height)*canvas.height;}});
+            function render(t){if(typeof ResizeObserver==='undefined')syncSize();gl.viewport(0,0,canvas.width,canvas.height);if(uTime)gl.uniform1f(uTime,t*.001);if(uRes)gl.uniform2f(uRes,canvas.width,canvas.height);if(uMouse)gl.uniform2f(uMouse,mouse.x,mouse.y);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);requestAnimationFrame(render);}
+            render(0);
+          })();
+        </script>
+      </div>
+
+      <!-- Ambient halos -->
+      <div class="absolute -top-40 left-1/4 w-[600px] h-[600px] rounded-full bg-primary/10 blur-[130px] pointer-events-none"></div>
+      <div class="absolute top-1/3 right-10 w-[500px] h-[500px] rounded-full bg-secondary/10 blur-[140px] pointer-events-none"></div>
+
+      <!-- ── Workspace ────────────────────────────────────────────────── -->
+      <div class="relative z-10 w-full px-gutter py-space-lg flex flex-col gap-space-xl max-w-[1720px] mx-auto">
+
+        <!-- Studio Headline Banner -->
+        <section class="flex flex-col gap-space-sm pt-space-xs">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-space-xs border-b border-surface-variant/40">
+            <div class="space-y-space-xs">
+              <div class="inline-flex items-center gap-space-xs px-space-sm py-0.5 rounded-full bg-surface-container-high">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <span class="font-label-caps text-label-caps uppercase tracking-wider text-primary">AI Studio v2.4</span>
+              </div>
+              <h1 class="font-display-hero text-display-hero text-on-surface tracking-tight leading-none">
+                Property <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-surface-tint to-secondary">Studio AI</span>
+              </h1>
+              <p class="font-headline-sm text-headline-sm text-on-surface-variant font-normal max-w-3xl leading-relaxed">
+                Transform static property listings into cinematic 4K video tours with neural motion tracking and emotive voiceovers.
+              </p>
+            </div>
+            <div class="flex items-center gap-space-sm shrink-0">
+              <button id="mainGenerateBtn" class="px-space-lg py-space-sm rounded-xl bg-primary text-on-primary font-label-interactive text-label-interactive flex items-center gap-space-xs shadow-lg hover:shadow-primary/40 transition-all font-semibold">
+                <span class="material-symbols-outlined text-[18px]">auto_videocam</span>Synthesize 4K Cinema
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Split-Screen Production Console -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg">
+
+          <!-- ── LEFT WORKBENCH (7 cols) ──────────────────────────────── -->
+          <div class="lg:col-span-7 flex flex-col gap-space-md">
+
+            <!-- Mode Tabs -->
+            <div class="flex items-center gap-space-xs p-1 rounded-xl bg-surface-container-lowest shadow-inner">
+              <button id="tabCreate" class="tab-btn px-space-md py-space-sm rounded-lg bg-primary-container text-on-primary-container font-label-interactive text-label-interactive flex items-center gap-space-xs transition-all shadow-md">
+                <span class="material-symbols-outlined text-[16px]">movie_edit</span>Create Video
+              </button>
+              <button id="tabPreview" class="tab-btn px-space-md py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-label-interactive text-label-interactive flex items-center gap-space-xs transition-all">
+                <span class="material-symbols-outlined text-[16px]">timeline</span>Preview &amp; Timeline
+              </button>
+              <button id="tabArch" class="tab-btn px-space-md py-space-sm rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-label-interactive text-label-interactive flex items-center gap-space-xs transition-all">
+                <span class="material-symbols-outlined text-[16px]">neurology</span>AI Architecture
+              </button>
+            </div>
+
+            <!-- ════ TAB: CREATE VIDEO ════ -->
+            <div id="panelCreate" class="flex flex-col gap-space-md">
+
+              <!-- Property Specifications Card -->
+              <div class="rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-xl relative flex flex-col p-space-md gap-space-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-1 border-b border-surface-variant/30">
+                  <div class="flex items-center gap-space-sm">
+                    <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-sm">
+                      <span class="material-symbols-outlined text-[22px]">apartment</span>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Property Specs &amp; Motion Direction</h3>
+                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-surface-container font-mono text-primary font-bold">AI Guided</span>
+                      </div>
+                      <p class="font-body-sm text-body-sm text-on-surface-variant">Neural geometry parsing and spatial camera staging parameters.</p>
+                    </div>
+                  </div>
+                  <!-- Preset buttons -->
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <button type="button" class="preset-btn px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps transition-colors" data-preset="green-valley">Green Valley</button>
+                    <button type="button" class="preset-btn px-2.5 py-1 rounded-lg bg-surface-container text-primary font-label-caps text-label-caps font-bold transition-colors shadow-sm active-preset" data-preset="ocean-crest">Ocean Crest</button>
+                    <button type="button" class="preset-btn px-2.5 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface font-label-caps text-label-caps transition-colors" data-preset="aspen-lodge">Aspen Lodge</button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-1">
+                  <!-- Property Name -->
+                  <div class="flex flex-col gap-1">
+                    <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline" for="propName">Property Name / Headline *</label>
+                    <div class="flex items-center gap-2 px-space-sm py-1.5 rounded-xl bg-surface-container-lowest border border-outline-variant/30 focus-within:border-primary/50 transition-colors shadow-inner">
+                      <span class="material-symbols-outlined text-[18px] text-tertiary">home</span>
+                      <input id="propName" type="text" value="Ocean Crest Penthouse" placeholder="e.g. Green Valley Residency" class="bg-transparent border-none outline-none text-on-surface font-label-interactive text-label-interactive w-full placeholder:text-outline">
+                    </div>
+                  </div>
+
+                  <!-- Property Type -->
+                  <div class="flex flex-col gap-1">
+                    <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline" for="propType">Property Type &amp; Staging</label>
+                    <div class="flex items-center gap-2 px-space-sm py-1.5 rounded-xl bg-surface-container-lowest border border-outline-variant/30 transition-colors shadow-inner hover:border-primary/50 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 relative">
+                      <span class="material-symbols-outlined text-[18px] text-tertiary">villa</span>
+                      <select id="propType" class="bg-transparent border-none outline-none text-on-surface font-body-lg text-body-lg w-full cursor-pointer appearance-none pr-8">
+                        <option class="bg-surface-container text-on-surface">2-BHK apartment</option>
+                        <option class="bg-surface-container text-on-surface">3-BHK apartment</option>
+                        <option class="bg-surface-container text-on-surface" selected>Luxury Villa</option>
+                        <option class="bg-surface-container text-on-surface">Penthouse</option>
+                        <option class="bg-surface-container text-on-surface">Studio</option>
+                        <option class="bg-surface-container text-on-surface">Commercial Office</option>
+                        <option class="bg-surface-container text-on-surface">Plot / Land</option>
+                      </select>
+                      <span class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                        <span class="material-symbols-outlined text-[20px]">expand_more</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Location -->
+                  <div class="flex flex-col gap-1">
+                    <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline" for="propLoc">Geographic Location *</label>
+                    <div class="flex items-center gap-2 px-space-sm py-1.5 rounded-xl bg-surface-container-lowest border border-outline-variant/30 focus-within:border-primary/50 transition-colors shadow-inner">
+                      <span class="material-symbols-outlined text-[18px] text-tertiary">pin_drop</span>
+                      <input id="propLoc" type="text" value="Biscayne Bay, Miami, FL" placeholder="e.g. Chandigarh, India" class="bg-transparent border-none outline-none text-on-surface font-label-interactive text-label-interactive w-full placeholder:text-outline">
+                    </div>
+                  </div>
+
+                  <!-- Price -->
+                  <div class="flex flex-col gap-1">
+                    <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline" for="propPrice">Listing Valuation *</label>
+                    <div class="flex items-center gap-2 px-space-sm py-1.5 rounded-xl bg-surface-container-lowest border border-outline-variant/30 focus-within:border-primary/50 transition-colors shadow-inner">
+                      <span class="material-symbols-outlined text-[18px] text-tertiary">payments</span>
+                      <input id="propPrice" type="text" value="$4,850,000 USD" placeholder="e.g. ₹85 lakh" class="bg-transparent border-none outline-none text-on-surface font-label-interactive text-label-interactive w-full placeholder:text-outline">
+                    </div>
+                  </div>
+
+                  <!-- Bedrooms -->
+                  <div class="flex flex-col gap-1">
+                    <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline">Bedrooms</label>
+                    <div class="flex items-center gap-2 px-space-sm py-1.5 rounded-xl bg-surface-container-lowest border border-outline-variant/30 shadow-inner">
+                      <span class="material-symbols-outlined text-[18px] text-tertiary">king_bed</span>
+                      <button id="decBed" type="button" class="w-6 h-6 rounded-md bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-center font-bold">−</button>
+                      <span id="bedCount" class="font-label-interactive text-label-interactive text-on-surface w-14 text-center">3 BHK</span>
+                      <button id="incBed" type="button" class="w-6 h-6 rounded-md bg-surface-container hover:bg-surface-container-high text-on-surface transition-colors flex items-center justify-center font-bold">+</button>
+                    </div>
+                  </div>
+
+                  <!-- Call to Action -->
+                  <div class="flex flex-col gap-1">
+                    <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline" for="propCta">Call to Action *</label>
+                    <div class="flex items-center gap-2 px-space-sm py-1.5 rounded-xl bg-surface-container-lowest border border-outline-variant/30 focus-within:border-primary/50 transition-colors shadow-inner">
+                      <span class="material-symbols-outlined text-[18px] text-tertiary">call</span>
+                      <input id="propCta" type="text" value="Call +1-305-555-0192 to schedule a viewing" placeholder="e.g. Call 98765 43210 to book a site visit" class="bg-transparent border-none outline-none text-on-surface font-label-interactive text-label-interactive w-full placeholder:text-outline">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <div class="flex flex-col gap-1">
+                  <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline" for="propDesc">Property Description (optional)</label>
+                  <textarea id="propDesc" rows="4" placeholder="Brief cinematic overview of the property…" class="px-space-sm py-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none text-on-surface font-body-lg text-body-lg resize-y placeholder:text-outline transition-colors shadow-inner min-h-[100px]">Elevated penthouse perched 48 floors above Biscayne Bay with sweeping panoramic views of the Miami skyline and Atlantic horizon.</textarea>
+                </div>
+
+                <!-- Features -->
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-caps text-label-caps uppercase tracking-wider text-outline">Key Cinematic Focal Points *</span>
+                    <button type="button" id="addFeatureBtn" class="text-primary hover:text-primary-fixed text-[11px] font-label-caps uppercase tracking-wider font-semibold flex items-center gap-0.5">
+                      <span class="material-symbols-outlined text-[14px]">add</span>Add Feature
+                    </button>
+                  </div>
+                  <textarea id="propFeatures" rows="6" placeholder="One feature per line:&#10;Infinity Pool&#10;Cliffside Views&#10;Floor-to-Ceiling Glass&#10;Private Helipad" class="px-space-sm py-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 outline-none text-on-surface font-body-lg text-body-lg resize-y placeholder:text-outline transition-colors shadow-inner font-mono min-h-[140px]">Infinity Pool
+Cliffside Ocean Views
+Floor-to-Ceiling Glass Walls
+Private Chef's Kitchen
+Smart Home Automation
+Private Rooftop Terrace</textarea>
+                </div>
+
+                <!-- Camera Motion -->
+                <div class="flex flex-col gap-1.5 pt-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-caps text-label-caps uppercase tracking-wider text-outline">Camera Motion Trajectory</span>
+                    <span class="font-mono text-[10px] text-primary">Ken Burns Engine v2</span>
+                  </div>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <button type="button" data-motion="ken-burns" class="motion-btn active-motion px-2 py-2 rounded-xl bg-primary-container text-on-primary-container font-label-interactive text-[12px] font-bold flex items-center justify-center gap-1.5 transition-all shadow-md">
+                      <span class="material-symbols-outlined text-[16px] motion-icon">panorama_horizontal</span>Ken Burns Drift
+                    </button>
+                    <button type="button" data-motion="drone-orbit" class="motion-btn px-2 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high border border-transparent text-on-surface font-label-interactive text-[12px] flex items-center justify-center gap-1.5 transition-all">
+                      <span class="material-symbols-outlined text-[16px] motion-icon text-outline">360</span>Drone Orbit 3D
+                    </button>
+                    <button type="button" data-motion="slow-pan" class="motion-btn px-2 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high border border-transparent text-on-surface font-label-interactive text-[12px] flex items-center justify-center gap-1.5 transition-all">
+                      <span class="material-symbols-outlined text-[16px] motion-icon text-outline">slow_motion_video</span>Slow Pan &amp; Reveal
+                    </button>
+                    <button type="button" data-motion="fpv" class="motion-btn px-2 py-2 rounded-xl bg-surface-container hover:bg-surface-container-high border border-transparent text-on-surface font-label-interactive text-[12px] flex items-center justify-center gap-1.5 transition-all">
+                      <span class="material-symbols-outlined text-[16px] motion-icon text-outline">flight</span>FPV Flythrough
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Audio Card -->
+              <div class="rounded-2xl bg-surface-container-low shadow-2xl relative flex flex-col p-space-md gap-space-sm">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-space-sm">
+                    <div class="w-10 h-10 rounded-xl bg-secondary-container/30 flex items-center justify-center text-secondary">
+                      <span class="material-symbols-outlined text-[22px]">graphic_eq</span>
+                    </div>
+                    <div>
+                      <h3 class="font-headline-sm text-headline-sm text-on-surface">Neural Audio &amp; Cinematic Score</h3>
+                      <p class="font-body-sm text-body-sm text-on-surface-variant">AI voice synthesis synchronized with responsive ambient acoustics.</p>
+                    </div>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input checked class="sr-only peer" id="voiceToggle" type="checkbox">
+                    <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+                  </label>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-space-xs">
+                  <!-- Voice settings -->
+                  <div class="p-space-md rounded-xl bg-surface-container-lowest border border-outline-variant/30 flex flex-col gap-space-sm shadow-inner">
+                    <div class="flex items-center justify-between">
+                      <span class="font-label-caps text-label-caps uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>AI Voice Engine
+                      </span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <div class="flex flex-col gap-1">
+                        <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline text-[10px]" for="accentSel">Accent</label>
+                        <div class="relative">
+                          <select id="accentSel" class="w-full px-3 py-2.5 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface font-body-lg text-body-lg outline-none cursor-pointer appearance-none hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                            <option value="co.in">English (India)</option>
+                            <option value="com">English (US)</option>
+                            <option value="co.uk">English (UK)</option>
+                            <option value="com.au">English (Australia)</option>
+                          </select>
+                          <span class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                            <span class="material-symbols-outlined text-[20px]">expand_more</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="flex flex-col gap-1">
+                        <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline text-[10px]" for="paceSel">Pacing</label>
+                        <div class="relative">
+                          <select id="paceSel" class="w-full px-3 py-2.5 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface font-body-lg text-body-lg outline-none cursor-pointer appearance-none hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all">
+                            <option value="normal">Normal</option>
+                            <option value="relaxed">Relaxed (Cinematic)</option>
+                          </select>
+                          <span class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-primary">
+                            <span class="material-symbols-outlined text-[20px]">expand_more</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-0.5 text-primary opacity-70 mt-1">
+                      <span class="w-0.5 h-2 bg-primary rounded-full animate-pulse"></span>
+                      <span class="w-0.5 h-3.5 bg-primary rounded-full animate-pulse" style="animation-delay:100ms"></span>
+                      <span class="w-0.5 h-1.5 bg-primary rounded-full animate-pulse" style="animation-delay:200ms"></span>
+                      <span class="w-0.5 h-4 bg-primary rounded-full animate-pulse" style="animation-delay:300ms"></span>
+                      <span class="w-0.5 h-2.5 bg-primary rounded-full animate-pulse" style="animation-delay:400ms"></span>
+                    </div>
+                  </div>
+
+                  <!-- Ambient score -->
+                  <div class="p-space-md rounded-xl bg-surface-container-lowest border border-outline-variant/30 flex flex-col justify-between gap-space-sm shadow-inner">
+                    <div class="flex items-center justify-between">
+                      <span class="font-label-caps text-label-caps uppercase tracking-wider text-secondary font-bold flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>Atmosphere Score
+                      </span>
+                      <div class="flex items-center gap-1">
+                        <span class="w-1 h-3 bg-secondary rounded-full animate-bounce"></span>
+                        <span class="w-1 h-5 bg-primary rounded-full animate-bounce" style="animation-delay:150ms"></span>
+                        <span class="w-1 h-2 bg-tertiary rounded-full animate-bounce" style="animation-delay:300ms"></span>
+                      </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="bgMusicToggle" checked class="w-4 h-4 accent-purple-500">
+                        <span class="font-label-interactive text-label-interactive text-on-surface">Background Music</span>
+                      </label>
+                      <div class="flex flex-col gap-1">
+                        <label class="font-label-caps text-label-caps uppercase tracking-wider text-outline text-[10px]" for="volSlider">Volume <span id="volVal">15%</span></label>
+                        <input id="volSlider" type="range" min="5" max="35" value="15" step="5" class="w-full accent-purple-500">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Image Upload Card -->
+              <div class="rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-xl relative flex flex-col p-space-md gap-space-sm">
+                <div class="flex items-center gap-space-sm pb-1 border-b border-surface-variant/30">
+                  <div class="w-10 h-10 rounded-xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center text-tertiary shadow-sm">
+                    <span class="material-symbols-outlined text-[22px]">photo_library</span>
+                  </div>
+                  <div>
+                    <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Property Photographs</h3>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">Upload 4–8 high-res photos. Auto-cropped to cinematic 16:9 widescreen.</p>
+                  </div>
+                </div>
+
+                <!-- Drop Zone -->
+                <div id="dropZone" class="flex flex-col items-center justify-center gap-space-sm p-space-lg rounded-xl border-2 border-dashed border-outline-variant/50 bg-surface-container-lowest cursor-pointer hover:border-primary/50 transition-all">
+                  <span class="material-symbols-outlined text-[48px] text-outline">cloud_upload</span>
+                  <div class="text-center">
+                    <p class="font-label-interactive text-label-interactive text-on-surface">Drop images here or <span class="text-primary underline cursor-pointer" id="browseLink">browse</span></p>
+                    <p class="font-body-sm text-body-sm text-outline mt-1">JPG, PNG, WEBP — minimum 4 images required</p>
+                  </div>
+                  <input id="imageInput" type="file" multiple accept=".jpg,.jpeg,.png,.webp">
+                </div>
+
+                <!-- OR — Use Sample Images -->
+                <div class="flex items-center gap-space-sm">
+                  <div class="flex-1 h-px bg-surface-variant/40"></div>
+                  <span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">or</span>
+                  <div class="flex-1 h-px bg-surface-variant/40"></div>
+                </div>
+                <div class="flex gap-2">
+                  <button type="button" id="useSampleGV" class="flex-1 px-space-sm py-2 rounded-xl bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-on-surface font-label-interactive text-label-interactive flex items-center justify-center gap-2 transition-all">
+                    <span class="material-symbols-outlined text-[16px] text-primary">apartment</span>Sample: Green Valley
+                  </button>
+                  <button type="button" id="useSampleOC" class="flex-1 px-space-sm py-2 rounded-xl bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-on-surface font-label-interactive text-label-interactive flex items-center justify-center gap-2 transition-all">
+                    <span class="material-symbols-outlined text-[16px] text-secondary">beach_access</span>Sample: Ocean Crest
+                  </button>
+                </div>
+
+                <!-- Thumbnail preview grid -->
+                <div id="thumbGrid" class="thumb-grid"></div>
+                <p id="thumbStatus" class="font-body-sm text-body-sm text-outline hidden"></p>
+              </div>
+
+              <!-- LLM Enhancement -->
+              <div class="rounded-xl bg-surface-container-low border border-outline-variant/30 p-space-md flex items-center justify-between gap-space-sm">
+                <div class="flex items-center gap-space-sm">
+                  <span class="material-symbols-outlined text-[22px] text-primary">psychology</span>
+                  <div>
+                    <p class="font-label-interactive text-label-interactive text-on-surface font-bold">LLM Script Enhancement</p>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">Use Gemini/GPT to elevate script prose quality</p>
+                  </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input class="sr-only peer" id="llmToggle" type="checkbox">
+                  <div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+                </label>
+              </div>
+              <div id="apiKeySection" class="hidden rounded-xl bg-surface-container-lowest border border-outline-variant/30 p-space-sm">
+                <div class="flex items-center gap-2 px-space-sm py-1.5">
+                  <span class="material-symbols-outlined text-[18px] text-outline">key</span>
+                  <input id="apiKeyInput" type="password" placeholder="Gemini / OpenAI API Key" class="bg-transparent border-none outline-none text-on-surface font-label-interactive text-label-interactive w-full placeholder:text-outline">
+                </div>
+              </div>
+            </div>
+            <!-- ════ END TAB: CREATE VIDEO ════ -->
+
+            <!-- ════ TAB: PREVIEW ════ -->
+            <div id="panelPreview" class="hidden flex-col gap-space-md">
+              <div id="videoResult" class="rounded-2xl bg-surface-container-low border border-outline-variant/30 shadow-xl overflow-hidden flex flex-col">
+                <div class="p-space-md border-b border-surface-variant/30 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                    <span class="font-label-interactive text-label-interactive text-on-surface font-bold">Generated Video</span>
+                  </div>
+                  <a id="downloadBtn" href="#" download class="px-space-md py-space-sm rounded-xl bg-primary text-on-primary font-label-interactive text-label-interactive flex items-center gap-2 hover:opacity-90 transition-all">
+                    <span class="material-symbols-outlined text-[18px]">download</span>Download MP4
+                  </a>
+                </div>
+                <video id="videoPlayer" controls class="w-full aspect-video bg-black"></video>
+                <div class="p-space-md bg-surface-container">
+                  <div id="sceneBreakdown" class="flex flex-col gap-2"></div>
+                </div>
+              </div>
+              <div id="noVideoMsg" class="flex flex-col items-center justify-center py-20 gap-4 text-center">
+                <span class="material-symbols-outlined text-[64px] text-outline">movie_off</span>
+                <p class="font-headline-sm text-headline-sm text-on-surface-variant">No video yet</p>
+                <p class="font-body-sm text-body-sm text-outline max-w-xs">Fill in details on the Create Video tab and click <strong class="text-primary">Synthesize 4K Cinema</strong></p>
+              </div>
+            </div>
+            <!-- ════ END TAB: PREVIEW ════ -->
+
+            <!-- ════ TAB: ARCHITECTURE ════ -->
+            <div id="panelArch" class="hidden rounded-2xl bg-surface-container-low border border-outline-variant/30 p-space-md shadow-xl">
+              <h3 class="font-headline-md text-headline-md text-on-surface font-bold mb-space-sm">Technical Pipeline Architecture</h3>
+              <div class="flex flex-col gap-space-sm text-body-md text-on-surface-variant">
+                <div class="p-space-sm rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex items-start gap-space-sm">
+                  <span class="material-symbols-outlined text-primary text-[22px] mt-0.5">verified</span>
+                  <div><p class="font-label-interactive text-label-interactive text-on-surface">1. Input &amp; Validation</p><p class="font-body-sm text-body-sm text-on-surface-variant">Enforces strict property field rules and validates photography (4–8 images, 100×100px min).</p></div>
+                </div>
+                <div class="p-space-sm rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex items-start gap-space-sm">
+                  <span class="material-symbols-outlined text-secondary text-[22px] mt-0.5">description</span>
+                  <div><p class="font-label-interactive text-label-interactive text-on-surface">2. Script &amp; Caption Binding</p><p class="font-body-sm text-body-sm text-on-surface-variant">Rule-based template maps features strictly to scenes without hallucination. Optional LLM enhancement.</p></div>
+                </div>
+                <div class="p-space-sm rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex items-start gap-space-sm">
+                  <span class="material-symbols-outlined text-tertiary text-[22px] mt-0.5">image</span>
+                  <div><p class="font-label-interactive text-label-interactive text-on-surface">3. Image Composition &amp; Overlays</p><p class="font-body-sm text-body-sm text-on-surface-variant">Pillow-based typography. 1280×720 cover crop, category badge, cinematic vignette, glowing gold lower-thirds.</p></div>
+                </div>
+                <div class="p-space-sm rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex items-start gap-space-sm">
+                  <span class="material-symbols-outlined text-primary text-[22px] mt-0.5">graphic_eq</span>
+                  <div><p class="font-label-interactive text-label-interactive text-on-surface">4. Audio Synthesis &amp; Dynamic Sync</p><p class="font-body-sm text-body-sm text-on-surface-variant">gTTS / SAPI5 narration with sentence pacing. Procedural ambient music. Timeline dynamically calibrated.</p></div>
+                </div>
+                <div class="p-space-sm rounded-xl bg-surface-container-lowest border border-outline-variant/20 flex items-start gap-space-sm">
+                  <span class="material-symbols-outlined text-secondary text-[22px] mt-0.5">movie</span>
+                  <div><p class="font-label-interactive text-label-interactive text-on-surface">5. Ken Burns + Crossfade Rendering</p><p class="font-body-sm text-body-sm text-on-surface-variant">MoviePy 2.x — alternating zoom-in/out per scene (smoothstep eased), crossfade transitions, fade-to-black ending. H.264 MP4 + AAC stereo.</p></div>
+                </div>
+              </div>
+            </div>
+            <!-- ════ END TAB: ARCHITECTURE ════ -->
+
+            <!-- Bottom Action Deck -->
+            <div class="flex items-center justify-between rounded-2xl bg-surface-container-high shadow-xl py-space-sm px-space-md">
+              <div class="flex items-center gap-space-sm">
+                <button id="resetBtn" class="p-space-sm rounded-xl bg-surface-container hover:bg-surface-container-highest text-on-surface flex items-center gap-space-xs transition-colors">
+                  <span class="material-symbols-outlined text-[20px]">refresh</span>
+                  <span class="font-label-interactive text-label-interactive">Reset</span>
+                </button>
+              </div>
+              <button id="synthesizeBtn" class="px-space-xl py-space-sm rounded-xl bg-gradient-to-r from-primary via-primary-container to-secondary text-on-primary font-headline-sm text-headline-sm font-bold flex items-center gap-space-sm shadow-2xl hover:shadow-primary/50 hover:scale-[1.01] active:scale-[0.99] transition-all">
+                <span class="material-symbols-outlined text-[24px]">auto_videocam</span>
+                Synthesize 4K Cinema
+              </button>
+            </div>
+          </div>
+
+          <!-- ── RIGHT PANEL (5 cols) ─────────────────────────────────── -->
+          <div class="lg:col-span-5 flex flex-col gap-space-md h-full justify-between">
+            <!-- Live viewport -->
+            <div class="rounded-2xl bg-surface-container-low shadow-2xl overflow-hidden flex flex-col">
+              <div class="relative w-full aspect-video bg-black overflow-hidden group">
+                <img id="viewportImg" alt="Property preview" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=960&q=80">
+                <div class="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-black/20 pointer-events-none"></div>
+                <div id="viewportPlayBtn" class="absolute inset-0 m-auto w-16 h-16 rounded-full bg-primary/90 text-on-primary flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-transform backdrop-blur-md cursor-pointer">
+                  <span class="material-symbols-outlined text-[32px] ml-1">play_arrow</span>
+                </div>
+                <div class="absolute bottom-4 inset-x-4 flex items-center justify-between">
+                  <div class="flex items-center gap-2 px-space-sm py-1 rounded-md bg-surface-container-lowest/80 backdrop-blur-md">
+                    <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                    <span class="font-mono text-body-sm text-on-surface font-bold" id="viewportTime">Preview Ready</span>
+                  </div>
+                  <div class="flex items-center gap-space-xs">
+                    <span class="px-2 py-0.5 rounded bg-surface-container-lowest/80 backdrop-blur-md text-primary font-label-caps text-label-caps font-bold">4K UHD</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Render progress -->
+              <div id="renderProgress" class="p-space-md bg-surface-container flex flex-col gap-space-xs hidden">
+                <div class="flex items-center justify-between text-body-sm">
+                  <span class="font-label-caps text-label-caps text-outline uppercase tracking-wider" id="progressLabel">Rendering</span>
+                  <span class="font-label-caps text-label-caps text-primary font-bold" id="progressPct">0%</span>
+                </div>
+                <div class="relative w-full h-3 bg-surface-container-lowest rounded-full overflow-hidden flex items-center px-1">
+                  <div id="progressBar" class="h-full progress-bar-animated rounded-full" style="width:0%"></div>
+                </div>
+              </div>
+              <div id="renderStatus" class="p-space-md bg-surface-container-low flex items-center justify-between border-t border-surface-variant/40 hidden">
+                <div class="flex items-center gap-space-xs">
+                  <span class="material-symbols-outlined text-primary text-[18px] animate-spin">cyclone</span>
+                  <span class="font-label-interactive text-label-interactive text-on-surface" id="renderStatusText">Initializing…</span>
+                </div>
+                <span class="text-outline font-body-sm text-body-sm" id="renderEta"></span>
+              </div>
+            </div>
+
+            <!-- AI Narration Teleprompter -->
+            <div class="rounded-2xl bg-surface-container-low border border-outline-variant/30 p-space-md shadow-xl flex flex-col gap-space-sm">
+              <div class="flex items-center justify-between pb-1 border-b border-surface-variant/30">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                    <span class="material-symbols-outlined text-[18px]">record_voice_over</span>
+                  </div>
+                  <div class="flex flex-col">
+                    <div class="flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                      <h4 class="font-label-interactive text-label-interactive text-on-surface font-bold">AI Narration Preview</h4>
+                    </div>
+                    <p class="text-[11px] text-outline font-body-sm">Live voiceover script</p>
+                  </div>
+                </div>
+              </div>
+              <div id="teleprompterText" class="p-3 rounded-xl bg-surface-container-lowest border border-surface-variant/30 text-body-lg leading-relaxed text-on-surface-variant opacity-70 italic min-h-[100px] max-h-[180px] overflow-y-auto">
+                Fill in property details to preview the AI-generated narration script…
+              </div>
+              <div class="flex items-center gap-0.5 text-primary opacity-70 mt-1">
+                <span class="w-0.5 h-2.5 bg-primary rounded-full animate-pulse"></span>
+                <span class="w-0.5 h-4 bg-primary rounded-full animate-pulse" style="animation-delay:120ms"></span>
+                <span class="w-0.5 h-2 bg-secondary rounded-full animate-pulse" style="animation-delay:240ms"></span>
+                <span class="w-0.5 h-5 bg-primary rounded-full animate-pulse" style="animation-delay:360ms"></span>
+                <span class="w-0.5 h-3 bg-tertiary rounded-full animate-pulse" style="animation-delay:480ms"></span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ═══ FOOTER ═══════════════════════════════════════════════════════════ -->
+<footer class="w-full bg-surface-container-lowest">
+  <div class="w-full px-gutter py-space-md flex flex-col sm:flex-row items-center justify-between gap-space-md border-t border-surface-variant/30">
+    <div class="flex items-center gap-space-md">
+      <span class="material-symbols-outlined text-primary text-[22px] opacity-70">movie_creation</span>
+      <p class="text-on-surface-variant font-body-sm text-body-sm">© 2025 Property Studio AI. All rights reserved.</p>
+    </div>
+    <div class="flex items-center gap-space-lg text-on-surface-variant font-body-sm text-body-sm">
+      <a class="hover:text-primary transition-colors" href="#">Architecture</a>
+      <a class="hover:text-primary transition-colors" href="#">API</a>
+      <a class="hover:text-primary transition-colors" href="#">Privacy</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     JAVASCRIPT — Full interactivity & API integration
+═══════════════════════════════════════════════════════════════════════ -->
+<script>
+const API = '';  // same origin (FastAPI server)
+
+// ── Utilities ────────────────────────────────────────────────────────────
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.className = ''; }, 3600);
+}
+
+function setProgress(pct, label) {
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('overlayBar').style.width = pct + '%';
+  document.getElementById('overlayPct').textContent = pct + '%';
+  if (label) {
+    document.getElementById('progressLabel').textContent = label;
+    document.getElementById('overlaySubtitle').textContent = label;
+  }
+}
+
+// ── Tab switching ────────────────────────────────────────────────────────
+const tabs = [
+  { btn: 'tabCreate',  panel: 'panelCreate'  },
+  { btn: 'tabPreview', panel: 'panelPreview' },
+  { btn: 'tabArch',    panel: 'panelArch'    },
+];
+tabs.forEach(({ btn, panel }) => {
+  document.getElementById(btn).addEventListener('click', () => {
+    tabs.forEach(t => {
+      const b = document.getElementById(t.btn), p = document.getElementById(t.panel);
+      b.classList.remove('bg-primary-container','text-on-primary-container','shadow-md');
+      b.classList.add('text-on-surface-variant','hover:bg-surface-container-high');
+      p.classList.add('hidden'); p.classList.remove('flex');
+    });
+    const b = document.getElementById(btn), p = document.getElementById(panel);
+    b.classList.add('bg-primary-container','text-on-primary-container','shadow-md');
+    b.classList.remove('text-on-surface-variant','hover:bg-surface-container-high');
+    p.classList.remove('hidden');
+    if (panel === 'panelPreview') p.classList.add('flex');
+  });
+});
+
+// ── Bedroom counter ──────────────────────────────────────────────────────
+let bedrooms = 3;
+document.getElementById('decBed').addEventListener('click', () => {
+  if (bedrooms > 0) { bedrooms--; document.getElementById('bedCount').textContent = bedrooms + ' BHK'; }
+});
+document.getElementById('incBed').addEventListener('click', () => {
+  if (bedrooms < 20) { bedrooms++; document.getElementById('bedCount').textContent = bedrooms + ' BHK'; }
+});
+
+// ── Volume slider ────────────────────────────────────────────────────────
+document.getElementById('volSlider').addEventListener('input', e => {
+  document.getElementById('volVal').textContent = e.target.value + '%';
+});
+
+// ── LLM toggle ───────────────────────────────────────────────────────────
+document.getElementById('llmToggle').addEventListener('change', e => {
+  document.getElementById('apiKeySection').classList.toggle('hidden', !e.target.checked);
+});
+
+// ── Motion trajectory buttons ────────────────────────────────────────────
+document.querySelectorAll('.motion-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.motion-btn').forEach(b => {
+      b.classList.remove('bg-primary-container','text-on-primary-container','font-bold','shadow-md');
+      b.classList.add('bg-surface-container','text-on-surface','border-transparent');
+      const icon = b.querySelector('.motion-icon');
+      if (icon) icon.classList.add('text-outline');
+    });
+    btn.classList.add('bg-primary-container','text-on-primary-container','font-bold','shadow-md');
+    btn.classList.remove('bg-surface-container','text-on-surface','border-transparent');
+    const icon = btn.querySelector('.motion-icon');
+    if (icon) icon.classList.remove('text-outline');
+  });
+});
+
+// ── Preset data ───────────────────────────────────────────────────────────
+const presetsData = {
+  'green-valley': {
+    name: 'Green Valley Residency', loc: 'Sector 5, Chandigarh', price: '₹1.45 Cr',
+    type: '2-BHK apartment', bedrooms: 2,
+    cta: 'Call +91-98765-43210 for a site visit',
+    features: 'Modern Modular Kitchen\nLarge Balcony with Park View\nCovered Parking\nGated Community\n24/7 Security',
+    desc: 'A serene residential community nestled within lush greenery in the heart of Chandigarh.'
+  },
+  'ocean-crest': {
+    name: 'Ocean Crest Penthouse', loc: 'Biscayne Bay, Miami, FL', price: '$4,850,000 USD',
+    type: 'Penthouse', bedrooms: 4,
+    cta: 'Call +1-305-555-0192 to schedule a private viewing',
+    features: 'Infinity Pool\nCliffside Ocean Views\nFloor-to-Ceiling Glass Walls\nPrivate Chef\'s Kitchen\nSmart Home Automation\nPrivate Rooftop Terrace',
+    desc: 'Elevated penthouse perched 48 floors above Biscayne Bay with sweeping panoramic views of the Miami skyline.'
+  },
+  'aspen-lodge': {
+    name: 'Aspen Timberline Lodge', loc: 'Red Mountain, Aspen, CO', price: '$12,400,000 USD',
+    type: 'Luxury Villa', bedrooms: 6,
+    cta: 'Contact concierge@aspenlodge.com for a private tour',
+    features: 'Private Ski-In/Ski-Out Access\nHeated Infinity Outdoor Pool\nWine Cellar & Tasting Room\nCinema Room\nMountain Summit Views\nGuest Chalet',
+    desc: 'A timeless alpine sanctuary set against the dramatic backdrop of Red Mountain, Aspen.'
+  }
+};
+
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.preset;
+    const d = presetsData[id];
+    if (!d) return;
+    document.getElementById('propName').value = d.name;
+    document.getElementById('propLoc').value = d.loc;
+    document.getElementById('propPrice').value = d.price;
+    document.getElementById('propCta').value = d.cta;
+    document.getElementById('propFeatures').value = d.features;
+    document.getElementById('propDesc').value = d.desc;
+    const sel = document.getElementById('propType');
+    for (let o of sel.options) { if (o.value === d.type || o.text === d.type) { o.selected = true; break; } }
+    bedrooms = d.bedrooms;
+    document.getElementById('bedCount').textContent = bedrooms + ' BHK';
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('text-primary','font-bold','shadow-sm'));
+    btn.classList.add('text-primary','font-bold','shadow-sm');
+    updateTeleprompter();
+    showToast('✓ Preset loaded: ' + d.name, 'success');
+  });
+});
+
+// ── Teleprompter preview ──────────────────────────────────────────────────
+function updateTeleprompter() {
+  const name = document.getElementById('propName').value || 'this stunning property';
+  const loc  = document.getElementById('propLoc').value  || 'a prime location';
+  const price = document.getElementById('propPrice').value || '';
+  const feats = (document.getElementById('propFeatures').value || '').split('\n').filter(f=>f.trim()).slice(0,2);
+  let text = `Welcome to ${name}, located in ${loc}.`;
+  if (price) text += ` Listed at ${price}.`;
+  if (feats.length) text += ` Featuring ${feats.join(' and ')}.`;
+  document.getElementById('teleprompterText').textContent = text;
+  document.getElementById('teleprompterText').classList.remove('italic','opacity-70');
+}
+['propName','propLoc','propPrice','propFeatures'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateTeleprompter);
+});
+updateTeleprompter();
+
+// ── Image upload ──────────────────────────────────────────────────────────
+let uploadedFiles = [];
+let useSampleKey = null;
+
+const dropZone = document.getElementById('dropZone');
+const imageInput = document.getElementById('imageInput');
+document.getElementById('browseLink').addEventListener('click', () => imageInput.click());
+dropZone.addEventListener('click', e => { if (e.target.id !== 'browseLink') imageInput.click(); });
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drop-active'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drop-active'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drop-active');
+  handleFiles(Array.from(e.dataTransfer.files));
+});
+imageInput.addEventListener('change', e => handleFiles(Array.from(e.target.files)));
+
+function handleFiles(files) {
+  uploadedFiles = files.filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f.name));
+  useSampleKey = null;
+  renderThumbs();
+}
+
+function renderThumbs() {
+  const grid = document.getElementById('thumbGrid');
+  const status = document.getElementById('thumbStatus');
+  grid.innerHTML = '';
+  if (uploadedFiles.length) {
+    uploadedFiles.forEach((f, i) => {
+      const url = URL.createObjectURL(f);
+      const img = document.createElement('img');
+      img.src = url; img.title = f.name;
+      grid.appendChild(img);
+    });
+    status.textContent = `${uploadedFiles.length} image${uploadedFiles.length > 1 ? 's' : ''} ready`;
+    status.classList.remove('hidden');
+    showToast(`✓ ${uploadedFiles.length} images uploaded`, 'success');
+  } else if (useSampleKey) {
+    status.textContent = `Using sample images: ${useSampleKey}`;
+    status.classList.remove('hidden');
+  } else {
+    status.classList.add('hidden');
+  }
+}
+
+document.getElementById('useSampleGV').addEventListener('click', () => {
+  uploadedFiles = []; useSampleKey = 'green_valley';
+  document.querySelectorAll('.preset-btn').forEach(b => b.dataset.preset === 'green-valley' && b.click());
+  renderThumbs();
+});
+document.getElementById('useSampleOC').addEventListener('click', () => {
+  uploadedFiles = []; useSampleKey = 'ocean_crest';
+  document.querySelectorAll('.preset-btn').forEach(b => b.dataset.preset === 'ocean-crest' && b.click());
+  renderThumbs();
+});
+
+// ── Reset ─────────────────────────────────────────────────────────────────
+document.getElementById('resetBtn').addEventListener('click', () => {
+  uploadedFiles = []; useSampleKey = null;
+  document.getElementById('thumbGrid').innerHTML = '';
+  document.getElementById('thumbStatus').classList.add('hidden');
+  document.getElementById('imageInput').value = '';
+  showToast('Parameters reset');
+});
+
+// ── Add Feature Button ────────────────────────────────────────────────────
+document.getElementById('addFeatureBtn').addEventListener('click', () => {
+  const featuresTextarea = document.getElementById('propFeatures');
+  const currentText = featuresTextarea.value.trim();
+  const newFeature = prompt('Enter a new feature:');
+  if (newFeature && newFeature.trim()) {
+    if (currentText) {
+      featuresTextarea.value = currentText + '\n' + newFeature.trim();
+    } else {
+      featuresTextarea.value = newFeature.trim();
+    }
+    showToast('✓ Feature added', 'success');
+    updateTeleprompter();
+  }
+});
+
+// ── Generate Video ────────────────────────────────────────────────────────
+async function synthesize() {
+  const name     = document.getElementById('propName').value.trim();
+  const loc      = document.getElementById('propLoc').value.trim();
+  const price    = document.getElementById('propPrice').value.trim();
+  const propType = document.getElementById('propType').value.trim();
+  const cta      = document.getElementById('propCta').value.trim();
+  const desc     = document.getElementById('propDesc').value.trim();
+  const features = document.getElementById('propFeatures').value.split('\n').filter(f=>f.trim());
+  const narration = document.getElementById('voiceToggle').checked;
+  const bgMusic   = document.getElementById('bgMusicToggle').checked;
+  const tld       = document.getElementById('accentSel').value;
+  const slow      = document.getElementById('paceSel').value === 'relaxed';
+  const vol       = parseInt(document.getElementById('volSlider').value) / 100;
+  const useLlm    = document.getElementById('llmToggle').checked;
+  const apiKey    = document.getElementById('apiKeyInput').value.trim();
+
+  if (!name)     { showToast('⚠ Property name is required', 'error'); return; }
+  if (!loc)      { showToast('⚠ Location is required', 'error'); return; }
+  if (!price)    { showToast('⚠ Price is required', 'error'); return; }
+  if (!cta)      { showToast('⚠ Call to action is required', 'error'); return; }
+  if (!features.length) { showToast('⚠ At least one feature is required', 'error'); return; }
+  if (!uploadedFiles.length && !useSampleKey) { showToast('⚠ Upload images or choose a sample preset', 'error'); return; }
+
+  // Show overlay
+  document.getElementById('renderOverlay').classList.add('active');
+  document.getElementById('renderProgress').classList.remove('hidden');
+  document.getElementById('renderStatus').classList.remove('hidden');
+  setProgress(5, 'Initializing pipeline…');
+  document.getElementById('renderStatusText').textContent = 'Starting render…';
+
+  const fd = new FormData();
+  fd.append('name', name);
+  fd.append('location', loc);
+  fd.append('price', price);
+  fd.append('property_type', propType);
+  fd.append('call_to_action', cta);
+  fd.append('description', desc);
+  fd.append('bedrooms', bedrooms);
+  fd.append('include_narration', narration);
+  fd.append('include_background_music', bgMusic);
+  fd.append('tts_tld', tld);
+  fd.append('tts_slow', slow);
+  fd.append('bg_music_volume', vol);
+  fd.append('use_llm', useLlm);
+  fd.append('api_key', apiKey);
+  fd.append('use_sample', useSampleKey || '');
+  features.forEach(f => fd.append('features', f));
+  uploadedFiles.forEach(f => fd.append('images', f, f.name));
+
+  try {
+    setProgress(10, 'Uploading photos & validating…');
+    const resp = await fetch(API + '/api/generate', { method: 'POST', body: fd });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ detail: 'Server error' }));
+      throw new Error(err.detail || resp.statusText);
+    }
+
+    // Stream SSE-style JSON progress from response body
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        try {
+          const msg = JSON.parse(line);
+          if (msg.progress !== undefined) setProgress(Math.round(msg.progress * 100), msg.status || '');
+          if (msg.status) document.getElementById('renderStatusText').textContent = msg.status;
+          if (msg.done && msg.video_url) {
+            onVideoReady(msg.video_url, msg.filename, msg.script);
+          }
+          if (msg.error) throw new Error(msg.error);
+        } catch(e) { if (e.message.includes('JSON')) continue; else throw e; }
+      }
+    }
+  } catch (err) {
+    document.getElementById('renderOverlay').classList.remove('active');
+    document.getElementById('renderProgress').classList.add('hidden');
+    document.getElementById('renderStatus').classList.add('hidden');
+    showToast('✗ ' + err.message, 'error');
+  }
+}
+
+function onVideoReady(videoUrl, filename, scriptData) {
+  document.getElementById('renderOverlay').classList.remove('active');
+  setProgress(100, 'Complete!');
+  document.getElementById('renderStatusText').textContent = '✓ Video ready!';
+
+  // Update video player
+  const player = document.getElementById('videoPlayer');
+  player.src = videoUrl;
+  document.getElementById('downloadBtn').href = videoUrl;
+  document.getElementById('downloadBtn').download = filename || 'property_video.mp4';
+  document.getElementById('videoResult').classList.add('visible');
+  document.getElementById('noVideoMsg').classList.add('hidden');
+
+  // Scene breakdown
+  if (scriptData && scriptData.scenes) {
+    const bd = document.getElementById('sceneBreakdown');
+    bd.innerHTML = scriptData.scenes.map((s, i) => `
+      <div class="p-2 rounded-lg bg-surface-container-lowest border border-outline-variant/20 flex items-center gap-2">
+        <span class="font-mono text-body-sm text-primary w-6">${i+1}</span>
+        <div class="flex-1 min-w-0">
+          <p class="font-label-interactive text-label-interactive text-on-surface truncate">${s.headline}</p>
+          <p class="font-body-sm text-body-sm text-outline truncate">${s.category_tag} • ${s.duration?.toFixed(1) || '?'}s</p>
+        </div>
+      </div>`).join('');
+  }
+
+  // Switch to preview tab
+  document.getElementById('tabPreview').click();
+  showToast('🎬 4K Cinema video ready!', 'success');
+  document.getElementById('viewportTime').textContent = 'Video Generated ✓';
+}
+
+// Wire all generate buttons
+['synthesizeBtn','mainGenerateBtn'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('click', synthesize);
+});
+
+// Preview play button → switch to preview tab
+document.getElementById('viewportPlayBtn').addEventListener('click', () => {
+  document.getElementById('tabPreview').click();
+});
+</script>
+
+</body>
+</html>

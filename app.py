@@ -93,16 +93,19 @@ if "initialized" not in st.session_state:
 with st.sidebar:
     # Brand Mark
     st.markdown("""
-    <div style="padding: 0.5rem 0 0.2rem 0;">
+    <div style="padding: 0.5rem 0 0.4rem 0;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="font-size: 1.1rem; font-weight: 700; color: #FAFAFA; letter-spacing: -0.03em;">
+            <div style="font-size: 1.15rem; font-weight: 800; letter-spacing: -0.035em;
+                        background: linear-gradient(135deg, #A855F7, #7C3AED); -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent; background-clip: text;">
                 ✦ Property Studio
             </div>
-            <span style="background: #27272A; color: #A1A1AA; font-size: 0.65rem; font-weight: 600;
-                         padding: 2px 7px; border-radius: 9999px; border: 1px solid #3F3F46;">v2.0</span>
+            <span style="background: rgba(124,58,237,0.18); color: #A78BFA; font-size: 0.64rem; font-weight: 700;
+                         padding: 2px 8px; border-radius: 9999px; border: 1px solid rgba(124,58,237,0.35);
+                         letter-spacing: 0.04em;">v2.0</span>
         </div>
-        <div style="font-size: 0.75rem; color: #71717A; margin-top: 2px;">
-            AI Video Production Studio
+        <div style="font-size: 0.74rem; color: #606080; margin-top: 3px; letter-spacing: 0.01em;">
+            AI Cinematic Video Studio
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -111,9 +114,9 @@ with st.sidebar:
 
     # Quick Start Presets
     st.markdown("""
-    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
-                color: rgba(255,255,255,0.45); font-weight: 600; margin-bottom: 0.6rem;">
-        Quick Start
+    <div style="font-size: 0.70rem; text-transform: uppercase; letter-spacing: 0.10em;
+                color: #7C3AED; font-weight: 700; margin-bottom: 0.6rem;">
+        ⚡ Quick Start
     </div>
     """, unsafe_allow_html=True)
 
@@ -131,9 +134,9 @@ with st.sidebar:
 
     # Video & Voice Settings
     st.markdown("""
-    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
-                color: rgba(255,255,255,0.45); font-weight: 600; margin-bottom: 0.6rem;">
-        Production Settings
+    <div style="font-size: 0.70rem; text-transform: uppercase; letter-spacing: 0.10em;
+                color: #7C3AED; font-weight: 700; margin-bottom: 0.6rem;">
+        🎙️ Production Settings
     </div>
     """, unsafe_allow_html=True)
 
@@ -214,14 +217,14 @@ with st.sidebar:
 
     # About
     st.markdown("""
-    <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
-                color: rgba(255,255,255,0.45); font-weight: 600; margin-bottom: 0.4rem;">
-        About
+    <div style="font-size: 0.70rem; text-transform: uppercase; letter-spacing: 0.10em;
+                color: #7C3AED; font-weight: 700; margin-bottom: 0.4rem;">
+        ℹ️ About
     </div>
     """, unsafe_allow_html=True)
     st.caption(
-        "Property Studio AI transforms property listings and photographs "
-        "into polished promotional videos with narration, captions, and ambient audio."
+        "Property Studio AI transforms real estate listings into cinematic animated videos "
+        "with Ken Burns zoom, crossfade transitions, AI narration, and ambient audio."
     )
 
 
@@ -229,14 +232,35 @@ with st.sidebar:
 # MAIN CONTENT AREA
 # ═══════════════════════════════════════════════════════════════════════════
 
+# ─── Studio Navigation ────────────────────────────────────────────────────
+st.markdown("""
+<header class="studio-topbar">
+    <div class="studio-topbar-brand">
+        <span class="studio-brand-icon">✦</span>
+        <span class="studio-brand-name">Property Studio<span>.AI</span></span>
+        <span class="studio-version"><span class="studio-status-dot"></span> v2.4 PRO ENGINE</span>
+    </div>
+    <nav class="studio-topbar-nav" aria-label="Primary navigation">
+        <span class="studio-nav-active">Studio</span>
+        <span>Showcase</span>
+        <span>Templates</span>
+        <span>AI Voices</span>
+        <span>Docs</span>
+    </nav>
+    <div class="studio-topbar-profile">
+        <span class="studio-profile-icon">●</span>
+    </div>
+</header>
+""", unsafe_allow_html=True)
+
 # ─── Hero Header ──────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero-header">
-    <div class="shadcn-badge">
-        <span class="shadcn-badge-dot"></span> AI Video Studio
+    <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span> AI Video Production Studio
     </div>
-    <h1 class="hero-title">Property Studio</h1>
-    <p class="hero-subtitle">High-impact promotional video generator for modern real estate listings.</p>
+    <h1 class="hero-title">Property Studio AI</h1>
+    <p class="hero-subtitle">Transform property listings into cinematic, animated promotional videos — narrated, scored, and ready to share.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -352,11 +376,11 @@ with tab_create:
             if sample_img_dir.exists():
                 selected_image_paths = sorted(list(sample_img_dir.glob("*.jpg")))
                 st.markdown(f"""
-                <div style="display: flex; align-items: center; gap: 8px; padding: 0.5rem 0.85rem;
-                            background: #F4F4F5; border: 1px solid #E4E4E7;
-                            border-radius: 6px; margin-bottom: 0.8rem;">
-                    <span style="font-size: 0.82rem; color: #18181B; font-weight: 500;">
-                        ✓ {len(selected_image_paths)} sample photographs loaded for <strong>{preset_title}</strong>
+                <div style="display: flex; align-items: center; gap: 8px; padding: 0.55rem 0.9rem;
+                            background: rgba(124,58,237,0.10); border: 1px solid rgba(124,58,237,0.28);
+                            border-radius: 8px; margin-bottom: 0.8rem;">
+                    <span style="font-size: 0.82rem; color: #C4B5FD; font-weight: 500;">
+                        ✓ {len(selected_image_paths)} sample photographs loaded — <strong style='color:#A78BFA;'>{preset_title}</strong>
                     </span>
                 </div>
                 """, unsafe_allow_html=True)
@@ -377,9 +401,9 @@ with tab_create:
 
     if selected_image_paths:
         st.markdown(f"""
-        <div style="font-size: 0.82rem; font-weight: 600; color: #192B3A; margin: 0.8rem 0 0.5rem 0;
-                    text-transform: uppercase; letter-spacing: 0.04em;">
-            Image Gallery — {len(selected_image_paths)} photographs
+        <div style="font-size: 0.75rem; font-weight: 700; color: #A0A0C0; margin: 1rem 0 0.5rem 0;
+                    text-transform: uppercase; letter-spacing: 0.10em;">
+            📷 Image Gallery — {len(selected_image_paths)} photographs
         </div>
         """, unsafe_allow_html=True)
 
@@ -578,25 +602,25 @@ with tab_preview:
             st.markdown(f"""
             <div class="studio-card" style="padding: 1.2rem;">
                 <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
-                    <tr style="border-bottom: 1px solid #E7E1D9;">
-                        <td style="padding: 0.5rem 0; color: #77736D; font-weight: 500;">Filename</td>
-                        <td style="padding: 0.5rem 0; color: #192B3A; text-align: right;"><code>{v_path.name}</code></td>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                        <td style="padding: 0.5rem 0; color: #a0a0c0; font-weight: 500;">Filename</td>
+                        <td style="padding: 0.5rem 0; color: #e3e1e9; text-align: right;"><code>{v_path.name}</code></td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #E7E1D9;">
-                        <td style="padding: 0.5rem 0; color: #77736D; font-weight: 500;">File Size</td>
-                        <td style="padding: 0.5rem 0; color: #192B3A; text-align: right;">{file_mb:.2f} MB</td>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                        <td style="padding: 0.5rem 0; color: #a0a0c0; font-weight: 500;">File Size</td>
+                        <td style="padding: 0.5rem 0; color: #e3e1e9; text-align: right;">{file_mb:.2f} MB</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #E7E1D9;">
-                        <td style="padding: 0.5rem 0; color: #77736D; font-weight: 500;">Resolution</td>
-                        <td style="padding: 0.5rem 0; color: #192B3A; text-align: right;">1280 × 720</td>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                        <td style="padding: 0.5rem 0; color: #a0a0c0; font-weight: 500;">Resolution</td>
+                        <td style="padding: 0.5rem 0; color: #e3e1e9; text-align: right;">1280 × 720</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #E7E1D9;">
-                        <td style="padding: 0.5rem 0; color: #77736D; font-weight: 500;">Format</td>
-                        <td style="padding: 0.5rem 0; color: #192B3A; text-align: right;">H.264 / AAC</td>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                        <td style="padding: 0.5rem 0; color: #a0a0c0; font-weight: 500;">Format</td>
+                        <td style="padding: 0.5rem 0; color: #e3e1e9; text-align: right;">H.264 / AAC</td>
                     </tr>
                     <tr>
-                        <td style="padding: 0.5rem 0; color: #77736D; font-weight: 500;">Status</td>
-                        <td style="padding: 0.5rem 0; color: #3A5A3C; text-align: right; font-weight: 500;">
+                        <td style="padding: 0.5rem 0; color: #a0a0c0; font-weight: 500;">Status</td>
+                        <td style="padding: 0.5rem 0; color: #6ee7b7; text-align: right; font-weight: 500;">
                             ● Ready to share
                         </td>
                     </tr>
@@ -650,20 +674,20 @@ with tab_preview:
                         st.markdown(f"""
                         <div class="shadcn-badge">{s.category_tag}</div>
                         <div style="margin-top: 0.6rem;">
-                            <div style="font-size: 0.85rem; font-weight: 600; color: #09090B;">{s.headline}</div>
-                            <div style="font-size: 0.78rem; color: #71717A; margin-top: 0.2rem;">{s.subheadline}</div>
+                            <div style="font-size: 0.85rem; font-weight: 600; color: #e3e1e9;">{s.headline}</div>
+                            <div style="font-size: 0.78rem; color: #a0a0c0; margin-top: 0.2rem;">{s.subheadline}</div>
                         </div>
                         """, unsafe_allow_html=True)
 
                     with sc_col2:
                         st.markdown(f"""
                         <div style="font-size: 0.8rem; margin-bottom: 0.5rem;">
-                            <span style="color: #77736D; font-weight: 500;">Caption:</span>
-                            <span style="color: #192B3A; font-style: italic;">&ldquo;{s.caption}&rdquo;</span>
+                            <span style="color: #a0a0c0; font-weight: 500;">Caption:</span>
+                            <span style="color: #e3e1e9; font-style: italic;">&ldquo;{s.caption}&rdquo;</span>
                         </div>
                         <div style="font-size: 0.8rem;">
-                            <span style="color: #77736D; font-weight: 500;">Voiceover:</span>
-                            <span style="color: #192B3A; font-style: italic;">&ldquo;{s.voiceover}&rdquo;</span>
+                            <span style="color: #a0a0c0; font-weight: 500;">Voiceover:</span>
+                            <span style="color: #e3e1e9; font-style: italic;">&ldquo;{s.voiceover}&rdquo;</span>
                         </div>
                         """, unsafe_allow_html=True)
 
@@ -710,31 +734,31 @@ with tab_docs:
             <h3 class="shadcn-card-title">Technical Pipeline Architecture</h3>
             <p class="shadcn-card-description">Automated real estate video production pipeline components.</p>
         </div>
-        <div style="line-height: 1.7; font-size: 0.875rem; color: #09090B;">
+        <div style="line-height: 1.7; font-size: 0.875rem; color: #e3e1e9;">
             <div style="margin-bottom: 1rem;">
                 <strong>1. Input &amp; Validation</strong> 
-                <code style="background: #F4F4F5; color: #18181B; border: 1px solid #E4E4E7; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/validators.py</code>
-                <br/><span style="color: #71717A;">Enforces strict property field rules and validates uploaded photography (4–8 images, 100×100px minimum).</span>
+                <code style="background: rgba(183,109,255,0.12); color: #ddb7ff; border: 1px solid rgba(183,109,255,0.25); padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/validators.py</code>
+                <br/><span style="color: #cfc2d6;">Enforces strict property field rules and validates uploaded photography (4–8 images, 100×100px minimum).</span>
             </div>
             <div style="margin-bottom: 1rem;">
                 <strong>2. Script &amp; Caption Binding</strong> 
-                <code style="background: #F4F4F5; color: #18181B; border: 1px solid #E4E4E7; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/script_generator.py</code>
-                <br/><span style="color: #71717A;">Rule-based template logic that maps features strictly to corresponding scenes without hallucinating.</span>
+                <code style="background: rgba(183,109,255,0.12); color: #ddb7ff; border: 1px solid rgba(183,109,255,0.25); padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/script_generator.py</code>
+                <br/><span style="color: #cfc2d6;">Rule-based template logic that maps features strictly to corresponding scenes without hallucinating.</span>
             </div>
             <div style="margin-bottom: 1rem;">
                 <strong>3. Image Composition &amp; Lower-Thirds</strong> 
-                <code style="background: #F4F4F5; color: #18181B; border: 1px solid #E4E4E7; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/image_processor.py</code>
-                <br/><span style="color: #71717A;">Pillow-based typography composition. High-resolution cover crop to 1280×720 (16:9), category pill badges, and contrast gradient overlays.</span>
+                <code style="background: rgba(183,109,255,0.12); color: #ddb7ff; border: 1px solid rgba(183,109,255,0.25); padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/image_processor.py</code>
+                <br/><span style="color: #cfc2d6;">Pillow-based typography composition. High-resolution cover crop to 1280×720 (16:9), category pill badges, and contrast gradient overlays.</span>
             </div>
             <div style="margin-bottom: 1rem;">
                 <strong>4. Audio Synthesis &amp; Dynamic Sync</strong> 
-                <code style="background: #F4F4F5; color: #18181B; border: 1px solid #E4E4E7; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/audio_generator.py</code>
-                <br/><span style="color: #71717A;">TTS speech generation with inter-sentence pacing. Procedural ambient background music synthesized offline. Timeline dynamically calibrated so slides match speech duration.</span>
+                <code style="background: rgba(183,109,255,0.12); color: #ddb7ff; border: 1px solid rgba(183,109,255,0.25); padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/audio_generator.py</code>
+                <br/><span style="color: #cfc2d6;">TTS speech generation with inter-sentence pacing. Procedural ambient background music synthesized offline. Timeline dynamically calibrated so slides match speech duration.</span>
             </div>
             <div>
                 <strong>5. Video Rendering &amp; Encoding</strong> 
-                <code style="background: #F4F4F5; color: #18181B; border: 1px solid #E4E4E7; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/video_generator.py</code>
-                <br/><span style="color: #71717A;">MoviePy 2.x and FFmpeg render H.264 MP4 with seamless crossfades and stereo AAC audio.</span>
+                <code style="background: rgba(183,109,255,0.12); color: #ddb7ff; border: 1px solid rgba(183,109,255,0.25); padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;">src/video_generator.py</code>
+                <br/><span style="color: #cfc2d6;">MoviePy 2.x and FFmpeg render H.264 MP4 with seamless crossfades and stereo AAC audio.</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
